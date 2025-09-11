@@ -3,47 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>在线工具站</title>
+    <title>AI图片裁剪工具 - 智能场景化裁剪</title>
     <link rel="stylesheet" href="css/style.css">
+    <meta name="description" content="AI驱动的移动端图片裁剪工具，提供可解释的智能裁剪建议，完美适配Instagram、TikTok等社交平台">
 </head>
 <body>
     <header>
         <nav class="navbar">
             <div class="nav-container">
-                <h1 class="nav-title">在线工具站</h1>
-                <ul class="nav-menu">
-                    <li><a href="#home">首页</a></li>
-                    <li><a href="#tools">工具</a></li>
-                    <li><a href="#about">关于</a></li>
-                </ul>
+                <h1 class="nav-title">AI图片裁剪</h1>
+                <div class="nav-info">
+                    <span class="beta-tag">Alpha</span>
+                    <span class="mobile-hint">📱 移动端优化</span>
+                </div>
             </div>
         </nav>
     </header>
 
     <main>
-        <section id="home" class="hero">
+        <!-- 上传区域 -->
+        <section id="upload-section" class="upload-section">
             <div class="container">
-                <h2>实用在线工具集合</h2>
-                <p>提供各种实用的在线工具，提高您的工作效率</p>
+                <h2>上传图片开始智能裁剪</h2>
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-content">
+                        <div class="upload-icon">📷</div>
+                        <p class="upload-text">拖拽图片到这里或点击上传</p>
+                        <p class="upload-hint">支持 JPG、PNG、GIF，最大 10MB</p>
+                        <button class="upload-btn" id="upload-btn">选择图片</button>
+                        <input type="file" id="file-input" accept="image/*" multiple style="display: none;">
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section id="tools" class="tools-section">
+        <!-- 场景选择区域 -->
+        <section id="scene-selection" class="scene-section" style="display: none;">
             <div class="container">
-                <h3>工具列表</h3>
-                <div class="tools-grid">
-                    <!-- 工具项目将通过JavaScript动态添加 -->
+                <h3>选择使用场景 <span class="optional">(AI会自动推荐最佳场景)</span></h3>
+                <div class="scene-tabs">
+                    <button class="scene-tab active" data-category="social">社交媒体</button>
+                    <button class="scene-tab" data-category="professional">专业用途</button>
+                    <button class="scene-tab" data-category="other">其他</button>
+                </div>
+                
+                <div class="scene-options" id="scene-options">
+                    <!-- 社交媒体选项 -->
+                    <div class="scene-category active" data-category="social">
+                        <div class="scene-grid">
+                            <button class="scene-option" data-scene="instagram-post">
+                                <div class="scene-preview" style="aspect-ratio: 1/1;"></div>
+                                <span>Instagram 帖子</span>
+                                <small>1:1</small>
+                            </button>
+                            <button class="scene-option" data-scene="instagram-story">
+                                <div class="scene-preview" style="aspect-ratio: 9/16;"></div>
+                                <span>Instagram 故事</span>
+                                <small>9:16</small>
+                            </button>
+                            <button class="scene-option" data-scene="tiktok">
+                                <div class="scene-preview" style="aspect-ratio: 9/16;"></div>
+                                <span>TikTok</span>
+                                <small>9:16</small>
+                            </button>
+                            <button class="scene-option" data-scene="wechat-avatar">
+                                <div class="scene-preview" style="aspect-ratio: 1/1;"></div>
+                                <span>微信头像</span>
+                                <small>1:1</small>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 专业用途选项 -->
+                    <div class="scene-category" data-category="professional">
+                        <div class="scene-grid">
+                            <button class="scene-option" data-scene="linkedin-avatar">
+                                <div class="scene-preview" style="aspect-ratio: 1/1;"></div>
+                                <span>LinkedIn 头像</span>
+                                <small>1:1</small>
+                            </button>
+                            <button class="scene-option" data-scene="resume-photo">
+                                <div class="scene-preview" style="aspect-ratio: 3/4;"></div>
+                                <span>简历照片</span>
+                                <small>3:4</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI裁剪结果区域 -->
+        <section id="crop-result" class="crop-section" style="display: none;">
+            <div class="container">
+                <h3>AI智能裁剪结果</h3>
+                
+                <!-- AI解释区域 -->
+                <div class="ai-explanation" id="ai-explanation">
+                    <div class="explanation-header">
+                        <span class="ai-badge">🤖 AI解释</span>
+                        <button class="explanation-toggle" id="explanation-toggle">详细说明</button>
+                    </div>
+                    <div class="explanation-content" id="explanation-content">
+                        <div class="explanation-reason" id="explanation-reason">
+                            <!-- AI生成的裁剪理由将在这里显示 -->
+                        </div>
+                        <div class="explanation-details" id="explanation-details" style="display: none;">
+                            <!-- AI生成的技术细节将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 裁剪预览区域 -->
+                <div class="crop-preview-area">
+                    <div class="image-container">
+                        <canvas id="crop-canvas"></canvas>
+                        <div class="crop-overlay" id="crop-overlay"></div>
+                    </div>
+                    
+                    <div class="crop-controls">
+                        <button class="control-btn" id="reset-btn">重置</button>
+                        <button class="control-btn" id="fine-tune-btn">微调</button>
+                        <button class="control-btn primary" id="download-btn">下载裁剪结果</button>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- 加载指示器 -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text" id="loading-text">AI正在分析图片...</p>
+        </div>
+    </div>
+
     <footer>
         <div class="container">
-            <p>&copy; 2024 在线工具站. All rights reserved.</p>
+            <p>&copy; 2024 AI图片裁剪工具. 基于先进的AI算法和摄影美学原理</p>
+            <p class="tech-note">⚡ 客户端处理，保护您的隐私</p>
         </div>
     </footer>
 
+    <!-- 待实现：AI裁剪和GPT解释功能 -->
     <script src="js/main.js"></script>
 </body>
 </html>

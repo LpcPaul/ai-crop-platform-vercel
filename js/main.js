@@ -1,414 +1,266 @@
-// 工具数据配置
-const tools = [
-    {
-        id: 'base64-encoder',
-        title: 'Base64编码/解码',
-        description: '将文本进行Base64编码或解码',
-        category: 'text'
-    },
-    {
-        id: 'url-encoder',
-        title: 'URL编码/解码',
-        description: '对URL进行编码或解码处理',
-        category: 'text'
-    },
-    {
-        id: 'md5-hash',
-        title: 'MD5加密',
-        description: '生成文本的MD5哈希值',
-        category: 'crypto'
-    },
-    {
-        id: 'json-formatter',
-        title: 'JSON格式化',
-        description: '格式化和验证JSON数据',
-        category: 'format'
-    },
-    {
-        id: 'qr-generator',
-        title: '二维码生成器',
-        description: '生成各种内容的二维码',
-        category: 'generator'
-    },
-    {
-        id: 'password-generator',
-        title: '密码生成器',
-        description: '生成安全的随机密码',
-        category: 'generator'
-    }
-];
+// AI图片裁剪工具 - 主要功能入口
+// 注意：这是前端框架，核心AI功能和GPT集成需要在后续开发中实现
 
-// 工具实现类
-class ToolManager {
+class AIImageCropper {
     constructor() {
-        this.modal = null;
+        this.currentImage = null;
+        this.currentScene = null;
+        this.cropResult = null;
         this.init();
     }
 
     init() {
-        this.createModal();
-        this.renderTools();
+        console.log('🤖 AI图片裁剪工具初始化');
+        console.log('⚠️ 当前版本：前端框架，AI功能待实现');
+        
         this.bindEvents();
+        this.detectMobileDevice();
     }
 
-    createModal() {
-        this.modal = document.createElement('div');
-        this.modal.className = 'modal';
-        this.modal.innerHTML = `
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <div class="modal-body">
-                    <h2 id="modal-title"></h2>
-                    <div id="modal-tool-interface"></div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(this.modal);
-    }
-
-    renderTools() {
-        const toolsGrid = document.querySelector('.tools-grid');
-        toolsGrid.innerHTML = '';
-
-        tools.forEach(tool => {
-            const toolCard = document.createElement('div');
-            toolCard.className = 'tool-card';
-            toolCard.innerHTML = `
-                <h4>${tool.title}</h4>
-                <p>${tool.description}</p>
-                <button class="tool-btn" data-tool-id="${tool.id}">使用工具</button>
-            `;
-            toolsGrid.appendChild(toolCard);
-        });
+    detectMobileDevice() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        if (isMobile) {
+            document.body.classList.add('mobile-device');
+            console.log('📱 检测到移动设备，启用移动端优化');
+        }
     }
 
     bindEvents() {
-        // 工具按钮点击事件
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('tool-btn')) {
-                const toolId = e.target.getAttribute('data-tool-id');
-                this.openTool(toolId);
+        // 文件上传事件
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+        const uploadArea = document.getElementById('upload-area');
+
+        uploadBtn?.addEventListener('click', () => fileInput?.click());
+        fileInput?.addEventListener('change', (e) => this.handleFileUpload(e));
+        
+        // 拖拽上传
+        uploadArea?.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea?.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea?.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                this.handleFileUpload({ target: { files: e.dataTransfer.files } });
             }
         });
 
-        // 模态框关闭事件
-        this.modal.querySelector('.close').addEventListener('click', () => {
-            this.modal.style.display = 'none';
+        // 场景选择事件
+        this.bindSceneEvents();
+        
+        // 解释展开事件
+        const explanationToggle = document.getElementById('explanation-toggle');
+        explanationToggle?.addEventListener('click', () => this.toggleExplanationDetails());
+    }
+
+    bindSceneEvents() {
+        // 场景标签切换
+        document.querySelectorAll('.scene-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.scene-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.scene-category').forEach(c => c.classList.remove('active'));
+                
+                e.target.classList.add('active');
+                const category = e.target.dataset.category;
+                document.querySelector(`[data-category="${category}"].scene-category`)?.classList.add('active');
+            });
         });
 
-        // 点击模态框外部关闭
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) {
-                this.modal.style.display = 'none';
-            }
-        });
-
-        // 导航菜单平滑滚动
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+        // 场景选择
+        document.querySelectorAll('.scene-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                const scene = e.currentTarget.dataset.scene;
+                this.selectScene(scene);
             });
         });
     }
 
-    openTool(toolId) {
-        const tool = tools.find(t => t.id === toolId);
-        if (!tool) return;
+    async handleFileUpload(event) {
+        const files = Array.from(event.target.files);
+        
+        if (files.length === 0) return;
 
-        const modalTitle = this.modal.querySelector('#modal-title');
-        const modalInterface = this.modal.querySelector('#modal-tool-interface');
-
-        modalTitle.textContent = tool.title;
-        modalInterface.innerHTML = this.getToolInterface(toolId);
-
-        this.modal.style.display = 'block';
-        this.bindToolEvents(toolId);
-    }
-
-    getToolInterface(toolId) {
-        switch (toolId) {
-            case 'base64-encoder':
-                return `
-                    <div class="tool-interface">
-                        <div class="input-group">
-                            <label>选择操作:</label>
-                            <select id="base64-mode">
-                                <option value="encode">编码</option>
-                                <option value="decode">解码</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label>输入文本:</label>
-                            <textarea id="base64-input" placeholder="请输入要处理的文本..."></textarea>
-                        </div>
-                        <button class="tool-btn" onclick="toolManager.processBase64()">处理</button>
-                        <div class="result-area" id="base64-result" style="display:none;"></div>
-                    </div>
-                `;
-
-            case 'url-encoder':
-                return `
-                    <div class="tool-interface">
-                        <div class="input-group">
-                            <label>选择操作:</label>
-                            <select id="url-mode">
-                                <option value="encode">编码</option>
-                                <option value="decode">解码</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label>输入URL:</label>
-                            <textarea id="url-input" placeholder="请输入要处理的URL..."></textarea>
-                        </div>
-                        <button class="tool-btn" onclick="toolManager.processURL()">处理</button>
-                        <div class="result-area" id="url-result" style="display:none;"></div>
-                    </div>
-                `;
-
-            case 'md5-hash':
-                return `
-                    <div class="tool-interface">
-                        <div class="input-group">
-                            <label>输入文本:</label>
-                            <textarea id="md5-input" placeholder="请输入要加密的文本..."></textarea>
-                        </div>
-                        <button class="tool-btn" onclick="toolManager.processMD5()">生成MD5</button>
-                        <div class="result-area" id="md5-result" style="display:none;"></div>
-                    </div>
-                `;
-
-            case 'json-formatter':
-                return `
-                    <div class="tool-interface">
-                        <div class="input-group">
-                            <label>输入JSON:</label>
-                            <textarea id="json-input" placeholder="请输入JSON数据..."></textarea>
-                        </div>
-                        <button class="tool-btn" onclick="toolManager.processJSON()">格式化</button>
-                        <div class="result-area" id="json-result" style="display:none;"></div>
-                    </div>
-                `;
-
-            case 'password-generator':
-                return `
-                    <div class="tool-interface">
-                        <div class="input-group">
-                            <label>密码长度:</label>
-                            <input type="number" id="pwd-length" value="12" min="4" max="64">
-                        </div>
-                        <div class="input-group">
-                            <label>
-                                <input type="checkbox" id="pwd-uppercase" checked> 包含大写字母
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label>
-                                <input type="checkbox" id="pwd-lowercase" checked> 包含小写字母
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label>
-                                <input type="checkbox" id="pwd-numbers" checked> 包含数字
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label>
-                                <input type="checkbox" id="pwd-symbols"> 包含特殊字符
-                            </label>
-                        </div>
-                        <button class="tool-btn" onclick="toolManager.generatePassword()">生成密码</button>
-                        <div class="result-area" id="pwd-result" style="display:none;"></div>
-                    </div>
-                `;
-
-            default:
-                return '<p>工具开发中...</p>';
-        }
-    }
-
-    bindToolEvents(toolId) {
-        // 这里可以绑定特定工具的事件
-    }
-
-    // Base64处理
-    processBase64() {
-        const mode = document.getElementById('base64-mode').value;
-        const input = document.getElementById('base64-input').value.trim();
-        const resultDiv = document.getElementById('base64-result');
-
-        if (!input) {
-            alert('请输入要处理的文本');
+        // 验证文件
+        const validFiles = files.filter(file => this.validateFile(file));
+        if (validFiles.length === 0) {
+            alert('请上传有效的图片文件（JPG、PNG、GIF，小于10MB）');
             return;
         }
 
+        // 处理第一个有效文件
+        const file = validFiles[0];
+        console.log(`📁 上传文件: ${file.name}, 大小: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+
         try {
-            let result;
-            if (mode === 'encode') {
-                result = btoa(unescape(encodeURIComponent(input)));
-            } else {
-                result = decodeURIComponent(escape(atob(input)));
+            this.showLoading('正在加载图片...');
+            
+            // 读取图片
+            const imageData = await this.readFileAsDataURL(file);
+            this.currentImage = {
+                file: file,
+                dataURL: imageData,
+                name: file.name
+            };
+
+            // 显示场景选择
+            this.showSceneSelection();
+            
+            // 🤖 TODO: 这里应该调用AI分析API，自动推荐最佳场景
+            console.log('🚧 AI场景推荐功能待实现');
+            
+        } catch (error) {
+            console.error('文件处理错误:', error);
+            alert('图片处理失败，请重试');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    validateFile(file) {
+        // 检查文件类型
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            return false;
+        }
+
+        // 检查文件大小 (10MB = 10 * 1024 * 1024)
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            return false;
+        }
+
+        return true;
+    }
+
+    readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    showSceneSelection() {
+        document.getElementById('upload-section').style.display = 'none';
+        document.getElementById('scene-selection').style.display = 'block';
+        console.log('🎯 显示场景选择界面');
+    }
+
+    async selectScene(scene) {
+        this.currentScene = scene;
+        console.log(`🎬 选择场景: ${scene}`);
+
+        try {
+            this.showLoading('AI正在分析图片并生成裁剪方案...');
+            
+            // 🤖 TODO: 调用AI裁剪API
+            await this.performAICrop(scene);
+            
+        } catch (error) {
+            console.error('AI裁剪失败:', error);
+            alert('AI处理失败，请重试');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    async performAICrop(scene) {
+        // 🚧 模拟AI处理延迟
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        console.log('🚧 AI裁剪功能待实现');
+        console.log('需要实现的功能:');
+        console.log('1. 图像内容分析（人脸检测、物体识别、构图分析）');
+        console.log('2. 基于场景的智能裁剪算法');
+        console.log('3. GPT-4.1集成生成解释文案');
+        console.log('4. 95%美学准确度评判');
+
+        // 显示模拟结果
+        this.showMockCropResult(scene);
+    }
+
+    showMockCropResult(scene) {
+        // 隐藏场景选择，显示裁剪结果
+        document.getElementById('scene-selection').style.display = 'none';
+        document.getElementById('crop-result').style.display = 'block';
+
+        // 模拟AI解释内容
+        const mockExplanation = this.getMockExplanation(scene);
+        document.getElementById('explanation-reason').innerHTML = mockExplanation.reason;
+        document.getElementById('explanation-details').innerHTML = mockExplanation.details;
+
+        console.log('🎨 显示模拟裁剪结果');
+        console.log('⚠️ 实际AI分析和GPT解释功能需要后续开发实现');
+    }
+
+    getMockExplanation(scene) {
+        // 🚧 这里是模拟内容，实际应该由GPT-4.1动态生成
+        const explanations = {
+            'instagram-post': {
+                reason: '方形社交（Instagram完美适配）<br>效果：突出主体人物，去掉边缘干扰元素，营造简洁现代的社交媒体风格。',
+                details: '我按「方形社交」完成了裁剪（仅裁切，无生成/拉伸）：<br><br>目标比例：1:1（Instagram帖子标准）<br>裁切框：左右各约12%，保留中心主体区域<br>导出尺寸：1080×1080<br><br>⚠️ 这是模拟内容，实际解释由GPT-4.1动态生成'
+            },
+            'instagram-story': {
+                reason: '竖屏故事（强调纵向延展感）<br>效果：保留完整人物比例，强化垂直视觉冲击，适合全屏观看体验。',
+                details: '我按「竖屏故事」完成了裁剪（仅裁切，无生成/拉伸）：<br><br>目标比例：9:16（Instagram故事标准）<br>裁切框：上下保留，左右约裁切25%<br>导出尺寸：1080×1920'
             }
+        };
 
-            resultDiv.innerHTML = `
-                <h4>处理结果:</h4>
-                <textarea readonly style="width:100%;min-height:80px;">${result}</textarea>
-                <button class="tool-btn" onclick="navigator.clipboard.writeText('${result.replace(/'/g, "\\'")}')">复制结果</button>
-            `;
-            resultDiv.style.display = 'block';
-        } catch (error) {
-            resultDiv.innerHTML = `<p style="color:red;">处理失败: ${error.message}</p>`;
-            resultDiv.style.display = 'block';
+        return explanations[scene] || {
+            reason: 'AI智能裁剪<br>效果：基于摄影美学原理优化构图，突出画面重点。',
+            details: '裁剪详细信息将由AI分析后显示...'
+        };
+    }
+
+    toggleExplanationDetails() {
+        const details = document.getElementById('explanation-details');
+        const toggle = document.getElementById('explanation-toggle');
+        
+        if (details.style.display === 'none') {
+            details.style.display = 'block';
+            toggle.textContent = '收起详细';
+        } else {
+            details.style.display = 'none';
+            toggle.textContent = '详细说明';
         }
     }
 
-    // URL处理
-    processURL() {
-        const mode = document.getElementById('url-mode').value;
-        const input = document.getElementById('url-input').value.trim();
-        const resultDiv = document.getElementById('url-result');
-
-        if (!input) {
-            alert('请输入要处理的URL');
-            return;
-        }
-
-        try {
-            let result;
-            if (mode === 'encode') {
-                result = encodeURIComponent(input);
-            } else {
-                result = decodeURIComponent(input);
-            }
-
-            resultDiv.innerHTML = `
-                <h4>处理结果:</h4>
-                <textarea readonly style="width:100%;min-height:80px;">${result}</textarea>
-                <button class="tool-btn" onclick="navigator.clipboard.writeText('${result.replace(/'/g, "\\'")}')">复制结果</button>
-            `;
-            resultDiv.style.display = 'block';
-        } catch (error) {
-            resultDiv.innerHTML = `<p style="color:red;">处理失败: ${error.message}</p>`;
-            resultDiv.style.display = 'block';
-        }
+    showLoading(message) {
+        const overlay = document.getElementById('loading-overlay');
+        const text = document.getElementById('loading-text');
+        
+        if (text) text.textContent = message;
+        if (overlay) overlay.style.display = 'flex';
     }
 
-    // MD5处理（简单实现，实际应用建议使用专业加密库）
-    async processMD5() {
-        const input = document.getElementById('md5-input').value.trim();
-        const resultDiv = document.getElementById('md5-result');
-
-        if (!input) {
-            alert('请输入要加密的文本');
-            return;
-        }
-
-        try {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(input);
-            const hashBuffer = await crypto.subtle.digest('MD5', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            resultDiv.innerHTML = `
-                <h4>MD5哈希值:</h4>
-                <textarea readonly style="width:100%;min-height:50px;">${hashHex}</textarea>
-                <button class="tool-btn" onclick="navigator.clipboard.writeText('${hashHex}')">复制结果</button>
-            `;
-            resultDiv.style.display = 'block';
-        } catch (error) {
-            // Fallback: 使用简单的哈希实现
-            const result = this.simpleHash(input);
-            resultDiv.innerHTML = `
-                <h4>哈希值 (简化版):</h4>
-                <textarea readonly style="width:100%;min-height:50px;">${result}</textarea>
-                <button class="tool-btn" onclick="navigator.clipboard.writeText('${result}')">复制结果</button>
-                <p style="color:orange;font-size:12px;">注: 这是简化版哈希，仅供演示使用</p>
-            `;
-            resultDiv.style.display = 'block';
-        }
-    }
-
-    // 简单哈希函数（仅供演示）
-    simpleHash(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        return Math.abs(hash).toString(16);
-    }
-
-    // JSON格式化
-    processJSON() {
-        const input = document.getElementById('json-input').value.trim();
-        const resultDiv = document.getElementById('json-result');
-
-        if (!input) {
-            alert('请输入JSON数据');
-            return;
-        }
-
-        try {
-            const parsed = JSON.parse(input);
-            const formatted = JSON.stringify(parsed, null, 2);
-
-            resultDiv.innerHTML = `
-                <h4>格式化结果:</h4>
-                <pre style="background:#f8f9fa;padding:15px;border-radius:5px;overflow:auto;max-height:300px;">${formatted}</pre>
-                <button class="tool-btn" onclick="navigator.clipboard.writeText('${formatted.replace(/'/g, "\\'")}')">复制结果</button>
-            `;
-            resultDiv.style.display = 'block';
-        } catch (error) {
-            resultDiv.innerHTML = `<p style="color:red;">JSON格式错误: ${error.message}</p>`;
-            resultDiv.style.display = 'block';
-        }
-    }
-
-    // 密码生成
-    generatePassword() {
-        const length = parseInt(document.getElementById('pwd-length').value);
-        const uppercase = document.getElementById('pwd-uppercase').checked;
-        const lowercase = document.getElementById('pwd-lowercase').checked;
-        const numbers = document.getElementById('pwd-numbers').checked;
-        const symbols = document.getElementById('pwd-symbols').checked;
-        const resultDiv = document.getElementById('pwd-result');
-
-        if (!uppercase && !lowercase && !numbers && !symbols) {
-            alert('请至少选择一种字符类型');
-            return;
-        }
-
-        let charset = '';
-        if (uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if (lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-        if (numbers) charset += '0123456789';
-        if (symbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
-
-        let password = '';
-        for (let i = 0; i < length; i++) {
-            password += charset.charAt(Math.floor(Math.random() * charset.length));
-        }
-
-        resultDiv.innerHTML = `
-            <h4>生成的密码:</h4>
-            <div style="background:#f8f9fa;padding:15px;border-radius:5px;font-family:monospace;font-size:16px;word-break:break-all;">${password}</div>
-            <button class="tool-btn" onclick="navigator.clipboard.writeText('${password}')">复制密码</button>
-            <button class="tool-btn" onclick="toolManager.generatePassword()">重新生成</button>
-        `;
-        resultDiv.style.display = 'block';
+    hideLoading() {
+        const overlay = document.getElementById('loading-overlay');
+        if (overlay) overlay.style.display = 'none';
     }
 }
 
+// 🚧 开发提醒
+console.log('=' .repeat(60));
+console.log('🚧 AI图片裁剪工具 - 开发框架版本');
+console.log('=' .repeat(60));
+console.log('当前状态: 前端交互框架已完成');
+console.log('待实现功能:');
+console.log('1. 🤖 AI图像分析算法 (95%美学准确度)');
+console.log('2. 🧠 GPT-4.1集成 (可解释性文案生成)');
+console.log('3. 📱 移动端性能优化 (<2秒处理)');
+console.log('4. 🔒 隐私保护策略 (客户端vs服务端)');
+console.log('5. 📊 平台格式数据库 (100%格式准确度)');
+console.log('=' .repeat(60));
+
 // 初始化应用
-let toolManager;
 document.addEventListener('DOMContentLoaded', () => {
-    toolManager = new ToolManager();
+    window.aiImageCropper = new AIImageCropper();
 });

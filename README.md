@@ -15,6 +15,7 @@
 ### 核心文档
 - [`RESEARCH_REQUIREMENTS.md`](./RESEARCH_REQUIREMENTS.md) - 市场调研与用户需求分析
 - [`REQUIREMENTS_FINAL.md`](./REQUIREMENTS_FINAL.md) - 最终需求规格书
+- [`TECHNICAL_CLARIFICATIONS.md`](./TECHNICAL_CLARIFICATIONS.md) - 技术实现澄清（解决Review问题）
 - [`PROJECT_LOG.md`](./PROJECT_LOG.md) - 项目进展日志
 
 ### 项目配置
@@ -40,10 +41,11 @@ http://localhost:8000
 
 ### 技术栈
 - **前端**: HTML5, CSS3, JavaScript (ES6+)
-- **AI处理**: 
-  - 图像分析：HTML5 Canvas + 机器学习算法
+- **AI处理**: 混合架构
+  - 客户端：HTML5 Canvas + TensorFlow.js（轻量检测）
+  - 服务端：PyTorch/TensorFlow（深度美学分析）
   - 解释生成：GPT-4.1 API集成
-- **部署**: 静态网站托管（Netlify/Vercel）
+- **部署**: 前端静态托管 + 后端容器化部署
 
 ### 核心功能模块
 1. **图片上传与预处理**
@@ -62,9 +64,9 @@ http://localhost:8000
 - 用户痛点：43%用户在分享前经常编辑照片
 
 ### 技术指标要求
-- **格式准确度**: 100%（严格按用户选择输出）
-- **美学准确度**: 95%（基于摄影构图标准）
-- **处理速度**: AI分析<2秒，解释生成<3秒
+- **格式准确度**: 100%（严格校验，强制保证）
+- **美学准确度**: 95%（服务端深度模型保证）
+- **处理速度**: 混合架构总计<2秒，GPT解释<1秒（缓存优化）
 
 ## 🎨 差异化优势
 
@@ -133,11 +135,13 @@ http://localhost:8000
 2. **理解市场背景**：[RESEARCH_REQUIREMENTS.md](./RESEARCH_REQUIREMENTS.md)  
 3. **跟踪项目进展**：[PROJECT_LOG.md](./PROJECT_LOG.md)
 
-### 核心技术挑战
-1. **AI美学评判算法**：需要训练或集成高质量的构图评判模型
-2. **GPT-4.1集成**：设计合适的提示词和数据结构
-3. **移动端性能优化**：确保大图片处理的流畅体验
-4. **多平台格式适配**：维护准确的平台尺寸数据库
+### 核心技术挑战（已澄清解决方案）
+1. **AI美学评判算法**：混合架构，服务端深度模型保证95%准确度
+2. **GPT-4.1集成**：缓存机制+降级策略，成本控制+性能保证
+3. **移动端性能优化**：客户端轻量化+服务端处理，总计<2秒
+4. **多平台格式适配**：自动更新+人工验证，100%格式准确度
+
+*详细技术方案见 [TECHNICAL_CLARIFICATIONS.md](./TECHNICAL_CLARIFICATIONS.md)*
 
 ### 开发优先级
 1. **核心AI裁剪算法**（最高优先级）
