@@ -555,10 +555,19 @@
                     </div>
                     
                     <div class="technical-details">
-                        
                         <strong>📐 裁剪参数：</strong><br>
                         区域: (${result.crop_params.x}, ${result.crop_params.y}) 
-                        尺寸: ${result.crop_params.width} × ${result.crop_params.height}
+                        尺寸: ${result.crop_params.width} × ${result.crop_params.height}<br><br>
+                        
+                        <strong>🎯 主体锚点：</strong><br>
+                        横向: ${(result.subject_anchor_hint?.x_norm || 0.5).toFixed(2)} (${Math.round((result.subject_anchor_hint?.x_norm || 0.5) * 100)}%)<br>
+                        纵向: ${(result.subject_anchor_hint?.y_norm || 0.5).toFixed(2)} (${Math.round((result.subject_anchor_hint?.y_norm || 0.5) * 100)}%)
+                        
+                        ${result.validation_info ? `<br><br><strong>🔧 处理信息：</strong><br>
+                        ${result.validation_info.fallback_used ? '使用备用算法' : 
+                          `GPT尝试次数: ${result.validation_info.attempt_count}`}
+                        ${result.validation_info.crop_errors?.length > 0 ? 
+                          `<br>参数修正: ${result.validation_info.crop_errors.join(', ')}` : ''}` : ''}
                     </div>
                 </div>
             `;

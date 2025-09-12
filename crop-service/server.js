@@ -59,24 +59,106 @@ async function ensureDirectories() {
   }
 }
 
-// GPT-4.1 Vision API调用
+// 参数验证和修正函数
+function validateAndFixCropParams(cropParams, originalWidth, originalHeight) {
+  const errors = [];
+  let fixed = { ...cropParams };
+  
+  // 检查数据类型
+  if (!Number.isInteger(fixed.x) || !Number.isInteger(fixed.y) || 
+      !Number.isInteger(fixed.width) || !Number.isInteger(fixed.height)) {
+    errors.push('坐标参数必须是整数');
+    fixed.x = Math.floor(Number(fixed.x) || 0);
+    fixed.y = Math.floor(Number(fixed.y) || 0);
+    fixed.width = Math.floor(Number(fixed.width) || 100);
+    fixed.height = Math.floor(Number(fixed.height) || 100);
+  }
+  
+  // 检查最小尺寸约束
+  if (fixed.width < 100) {
+    errors.push('宽度必须至少100像素');
+    fixed.width = 100;
+  }
+  if (fixed.height < 100) {
+    errors.push('高度必须至少100像素');
+    fixed.height = 100;
+  }
+  
+  // 检查坐标范围
+  if (fixed.x < 0) {
+    errors.push('x坐标不能小于0');
+    fixed.x = 0;
+  }
+  if (fixed.y < 0) {
+    errors.push('y坐标不能小于0');
+    fixed.y = 0;
+  }
+  if (fixed.x > originalWidth - 100) {
+    errors.push('x坐标超出安全范围');
+    fixed.x = Math.max(0, originalWidth - 100);
+  }
+  if (fixed.y > originalHeight - 100) {
+    errors.push('y坐标超出安全范围');
+    fixed.y = Math.max(0, originalHeight - 100);
+  }
+  
+  // 检查越界问题
+  if (fixed.x + fixed.width > originalWidth) {
+    errors.push('裁剪区域宽度越界');
+    fixed.width = originalWidth - fixed.x;
+  }
+  if (fixed.y + fixed.height > originalHeight) {
+    errors.push('裁剪区域高度越界');
+    fixed.height = originalHeight - fixed.y;
+  }
+  
+  // 确保修正后仍满足最小尺寸
+  if (fixed.width < 100 || fixed.height < 100) {
+    errors.push('修正后尺寸仍然过小，使用默认居中裁剪');
+    const defaultSize = Math.min(originalWidth, originalHeight) * 0.8;
+    fixed.x = Math.floor((originalWidth - defaultSize) / 2);
+    fixed.y = Math.floor((originalHeight - defaultSize) / 2);
+    fixed.width = Math.floor(defaultSize);
+    fixed.height = Math.floor(defaultSize);
+  }
+  
+  return { fixed, errors };
+}
+
+// 验证subject_anchor_hint参数
+function validateAnchorHint(anchorHint) {
+  const errors = [];
+  let fixed = { ...anchorHint };
+  
+  if (typeof fixed.x_norm !== 'number' || fixed.x_norm < 0 || fixed.x_norm > 1) {
+    errors.push('x_norm必须在[0,1]范围内');
+    fixed.x_norm = Math.max(0, Math.min(1, Number(fixed.x_norm) || 0.5));
+  }
+  if (typeof fixed.y_norm !== 'number' || fixed.y_norm < 0 || fixed.y_norm > 1) {
+    errors.push('y_norm必须在[0,1]范围内');
+    fixed.y_norm = Math.max(0, Math.min(1, Number(fixed.y_norm) || 0.5));
+  }
+  
+  return { fixed, errors };
+}
+
+// GPT-4.1 Vision API调用（带参数验证和二次请求）
 async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode = 'aesthetic') {
   const axios = require('axios');
+  const fs = require('fs').promises;
   
-  const prompts = {
-    aesthetic: `你是专业的图片裁剪专家。分析这张图片(${originalWidth}×${originalHeight})，提供最佳美学裁剪方案。
-
-目标：让图片更美观、更有视觉冲击力。
-
-参考案例：
-case1: 电影宽银幕
-效果：强调孤独与辽阔感，去掉多余沙地与右侧亮点干扰
-
-case2: 方形极简（头像墙/封面友好） 
-效果：更克制的极简感，适合正方形平台位
-
-case3: 竖幅海报（强调"向上消散"的雾）
-效果：保留上部层层递进的雾，做海报/封面
+  // 加载新的prompt模板
+  let promptTemplate;
+  try {
+    promptTemplate = await fs.readFile(
+      path.join(__dirname, 'prompts', `v0.1-${mode}.txt`), 
+      'utf-8'
+    );
+  } catch (error) {
+    console.warn('无法加载prompt文件，使用内置模板');
+    promptTemplate = `你是专业的图片裁剪专家。坐标原点为左上角，单位为像素。
+**输入：** 原图尺寸 (${originalWidth}×${originalHeight})。
+**目标：** 让图片更美观、更有视觉冲击力。
 
 请返回JSON格式：
 {
@@ -85,76 +167,127 @@ case3: 竖幅海报（强调"向上消散"的雾）
     "效果": "具体的视觉效果描述"
   },
   "crop_params": {
-    "x": 起始X坐标（0到${originalWidth-100}之间）,
-    "y": 起始Y坐标（0到${originalHeight-100}之间）,
-    "width": 裁剪宽度（至少100像素）,
-    "height": 裁剪高度（至少100像素）
+    "x": 起始X坐标,
+    "y": 起始Y坐标,
+    "width": 裁剪宽度,
+    "height": 裁剪高度
+  },
+  "subject_anchor_hint": {
+    "x_norm": 0.50,
+    "y_norm": 0.50
   }
-}
+}`;
+  }
+  
+  const prompt = promptTemplate
+    .replace(/\$\{originalWidth\}/g, originalWidth)
+    .replace(/\$\{originalHeight\}/g, originalHeight);
 
-注意：裁剪区域必须完全在原图范围内。`,
-
-    platform: `你是社交媒体平台规范专家。分析图片(${originalWidth}×${originalHeight})，根据指定平台要求提供裁剪建议。
-
-平台规范：
-- Instagram帖子: 1080×1080 (1:1)
-- Instagram故事: 1080×1920 (9:16)
-- TikTok: 1080×1920 (9:16)
-- YouTube缩略图: 1280×720 (16:9)
-- Twitter头像: 400×400 (1:1)
-- LinkedIn头像: 400×400 (1:1)
-- Facebook封面: 1200×630 (16:9)
-
-请返回JSON格式裁剪参数，确保在图片范围内。`
-  };
-
-  try {
-    const response = await axios.post('https://api.apiyi.com/v1/chat/completions', {
-      model: 'gpt-4.1-preview',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: prompts[mode]
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:image/jpeg;base64,${imageBase64}`
+  // 最多尝试2次请求
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      console.log(`[GPT] 第${attempt}次请求 - 图片尺寸: ${originalWidth}×${originalHeight}`);
+      
+      const response = await axios.post('https://api.apiyi.com/v1/chat/completions', {
+        model: 'gpt-4.1-preview',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: prompt
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:image/jpeg;base64,${imageBase64}`
+                }
               }
-            }
-          ]
+            ]
+          }
+        ],
+        max_tokens: 800,
+        temperature: 0.3
+      }, {
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY || 'sk-cSkEKdy2yfQ5Lvlq10Db1c83823f4607Bb9a25751bE9Ac37'}`,
+          'Content-Type': 'application/json'
         }
-      ],
-      max_tokens: 800,
-      temperature: 0.3
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY || 'sk-cSkEKdy2yfQ5Lvlq10Db1c83823f4607Bb9a25751bE9Ac37'}`,
-        'Content-Type': 'application/json'
-      }
-    });
+      });
 
-    const content = response.data.choices[0].message.content;
-    
-    // 尝试提取JSON
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
-    } else {
-      throw new Error('无法解析GPT响应中的JSON');
+      const content = response.data.choices[0].message.content;
+      console.log(`[GPT] 原始响应长度: ${content.length}字符`);
+      
+      // 尝试提取JSON
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('无法解析GPT响应中的JSON');
+      }
+      
+      const parsedResult = JSON.parse(jsonMatch[0]);
+      
+      // 验证必要字段是否存在
+      if (!parsedResult.analysis || !parsedResult.crop_params) {
+        throw new Error('GPT响应缺少必要字段');
+      }
+      
+      // 验证并修正crop_params
+      const cropValidation = validateAndFixCropParams(
+        parsedResult.crop_params, 
+        originalWidth, 
+        originalHeight
+      );
+      
+      // 验证并修正subject_anchor_hint
+      let anchorValidation = { fixed: { x_norm: 0.5, y_norm: 0.5 }, errors: [] };
+      if (parsedResult.subject_anchor_hint) {
+        anchorValidation = validateAnchorHint(parsedResult.subject_anchor_hint);
+      }
+      
+      // 如果第一次请求参数有问题且尝试次数小于2，进行二次请求
+      if ((cropValidation.errors.length > 0 || anchorValidation.errors.length > 0) && attempt === 1) {
+        console.warn(`[GPT] 第${attempt}次请求参数有问题:`, [
+          ...cropValidation.errors,
+          ...anchorValidation.errors
+        ]);
+        console.log(`[GPT] 进行第二次请求尝试...`);
+        continue; // 继续下一次循环
+      }
+      
+      // 记录修正情况
+      if (cropValidation.errors.length > 0) {
+        console.warn(`[GPT] 裁剪参数已修正:`, cropValidation.errors);
+      }
+      if (anchorValidation.errors.length > 0) {
+        console.warn(`[GPT] 锚点参数已修正:`, anchorValidation.errors);
+      }
+      
+      // 返回修正后的结果
+      return {
+        analysis: parsedResult.analysis,
+        crop_params: cropValidation.fixed,
+        subject_anchor_hint: anchorValidation.fixed,
+        validation_info: {
+          crop_errors: cropValidation.errors,
+          anchor_errors: anchorValidation.errors,
+          attempt_count: attempt
+        }
+      };
+      
+    } catch (error) {
+      console.error(`[GPT] 第${attempt}次请求失败:`, error.message);
+      
+      // 如果是最后一次尝试，返回备用方案
+      if (attempt === 2) {
+        console.log(`[GPT] 所有尝试失败，使用备用算法`);
+        return generateFallbackCrop(mode, originalWidth, originalHeight);
+      }
     }
-    
-  } catch (error) {
-    console.error('GPT API调用失败:', error.message);
-    // 返回默认的美学裁剪参数
-    return generateFallbackCrop(mode);
   }
 }
 
-// 备用裁剪算法
+// 备用裁剪算法（包含subject_anchor_hint）
 function generateFallbackCrop(mode, originalWidth = 1080, originalHeight = 1350) {
   const aestheticCrops = [
     {
@@ -167,6 +300,10 @@ function generateFallbackCrop(mode, originalWidth = 1080, originalHeight = 1350)
         y: Math.floor(originalHeight * 0.15),
         width: Math.floor(originalWidth * 0.8),
         height: Math.floor(originalHeight * 0.7)
+      },
+      subject_anchor_hint: {
+        x_norm: 0.67, // 右侧三分线
+        y_norm: 0.33  // 上部三分线
       }
     },
     {
@@ -179,11 +316,41 @@ function generateFallbackCrop(mode, originalWidth = 1080, originalHeight = 1350)
         y: Math.floor(originalHeight * 0.1),
         width: Math.floor(originalWidth * 0.7),
         height: Math.floor(originalHeight * 0.8)
+      },
+      subject_anchor_hint: {
+        x_norm: 0.618, // 黄金比例点
+        y_norm: 0.382  // 黄金比例点
+      }
+    },
+    {
+      analysis: {
+        "方案标题": "居中稳定构图",
+        "效果": "平衡稳重，适合对称性主体展示"
+      },
+      crop_params: {
+        x: Math.floor(originalWidth * 0.2),
+        y: Math.floor(originalHeight * 0.2),
+        width: Math.floor(originalWidth * 0.6),
+        height: Math.floor(originalHeight * 0.6)
+      },
+      subject_anchor_hint: {
+        x_norm: 0.5, // 正中心
+        y_norm: 0.5
       }
     }
   ];
   
-  return aestheticCrops[Math.floor(Math.random() * aestheticCrops.length)];
+  const result = aestheticCrops[Math.floor(Math.random() * aestheticCrops.length)];
+  
+  // 添加验证信息标识这是备用算法
+  result.validation_info = {
+    crop_errors: [],
+    anchor_errors: [],
+    attempt_count: 0,
+    fallback_used: true
+  };
+  
+  return result;
 }
 
 // 智能裁剪处理
