@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI裁剪效果验证 - 简化版</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f7fa; 
+        }
+        .test-case { 
+            background: white; 
+            margin: 25px 0; 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+        }
+        .test-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
+        .test-title { color: #2c3e50; font-size: 1.2em; margin: 0; }
+        .test-status { 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 0.85em; 
+            font-weight: 600;
+            background: #ffeaa7; 
+            color: #d63031; 
+        }
+        .test-button { 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        .test-button:hover { transform: translateY(-2px); }
+        .test-button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .result-area { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-top: 15px;
+            display: none;
+        }
+        .success { background: #d1edff; border-left: 4px solid #007bff; }
+        .error { background: #ffe6e6; border-left: 4px solid #dc3545; }
+        .log { 
+            background: #2c3e50; 
+            color: #ecf0f1; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: 'Courier New', monospace; 
+            font-size: 0.9em;
+            margin-top: 15px;
+            white-space: pre-line;
+        }
+        h1 { text-align: center; color: #2c3e50; }
+        .summary { text-align: center; color: #7f8c8d; margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+    <h1>🤖 AI裁剪效果验证测试</h1>
+    <p class="summary">模拟GPT-4.1 Vision API的5个不同场景智能裁剪测试</p>
+
+    <!-- 测试案例1: Instagram帖子 -->
+    <div class="test-case">
+        <div class="test-header">
+            <h3 class="test-title">📸 测试1: 人像摄影 → Instagram帖子 (1:1)</h3>
+            <span class="test-status" id="status1">待测试</span>
+        </div>
+        <p><strong>场景描述:</strong> 1200×800的人像照片，需要裁剪为1080×1080的Instagram帖子格式</p>
+        <button class="test-button" onclick="runTest(1, 'instagram-post', '人像摄影')" id="btn1">开始测试</button>
+        <div class="result-area" id="result1"></div>
+        <div class="log" id="log1" style="display: none;"></div>
+    </div>
+
+    <!-- 测试案例2: Instagram故事 -->
+    <div class="test-case">
+        <div class="test-header">
+            <h3 class="test-title">🏞️ 测试2: 风景照片 → Instagram故事 (9:16)</h3>
+            <span class="test-status" id="status2">待测试</span>
+        </div>
+        <p><strong>场景描述:</strong> 1600×900的风景照片，需要裁剪为1080×1920的Instagram故事格式</p>
+        <button class="test-button" onclick="runTest(2, 'instagram-story', '风景摄影')" id="btn2">开始测试</button>
+        <div class="result-area" id="result2"></div>
+        <div class="log" id="log2" style="display: none;"></div>
+    </div>
+
+    <!-- 测试案例3: TikTok -->
+    <div class="test-case">
+        <div class="test-header">
+            <h3 class="test-title">👥 测试3: 多人合影 → TikTok (9:16)</h3>
+            <span class="test-status" id="status3">待测试</span>
+        </div>
+        <p><strong>场景描述:</strong> 1400×1000的群体照片，需要裁剪为1080×1920的TikTok格式</p>
+        <button class="test-button" onclick="runTest(3, 'tiktok', '多人合影')" id="btn3">开始测试</button>
+        <div class="result-area" id="result3"></div>
+        <div class="log" id="log3" style="display: none;"></div>
+    </div>
+
+    <!-- 测试案例4: LinkedIn头像 -->
+    <div class="test-case">
+        <div class="test-header">
+            <h3 class="test-title">💼 测试4: 商务头像 → LinkedIn头像 (1:1)</h3>
+            <span class="test-status" id="status4">待测试</span>
+        </div>
+        <p><strong>场景描述:</strong> 1000×1200的商务照片，需要裁剪为400×400的LinkedIn头像格式</p>
+        <button class="test-button" onclick="runTest(4, 'linkedin-avatar', '商务头像')" id="btn4">开始测试</button>
+        <div class="result-area" id="result4"></div>
+        <div class="log" id="log4" style="display: none;"></div>
+    </div>
+
+    <!-- 测试案例5: 微信头像 -->
+    <div class="test-case">
+        <div class="test-header">
+            <h3 class="test-title">😊 测试5: 生活照片 → 微信头像 (1:1)</h3>
+            <span class="test-status" id="status5">待测试</span>
+        </div>
+        <p><strong>场景描述:</strong> 1100×800的生活照片，需要裁剪为640×640的微信头像格式</p>
+        <button class="test-button" onclick="runTest(5, 'wechat-avatar', '休闲生活')" id="btn5">开始测试</button>
+        <div class="result-area" id="result5"></div>
+        <div class="log" id="log5" style="display: none;"></div>
+    </div>
+
+    <!-- 批量测试 -->
+    <div style="text-align: center; margin: 40px 0;">
+        <button class="test-button" onclick="runAllTests()" style="font-size: 1.1em; padding: 15px 30px;">
+            🚀 运行所有测试
+        </button>
+        <button class="test-button" onclick="showLogs()" style="background: #6c757d;">
+            📋 显示详细日志
+        </button>
+    </div>
+
+    <script>
+        // 模拟GPT-4.1 Vision API的响应
+        const mockGPTResponses = {
+            'instagram-post': {
+                reason: "检测到人像主体位于画面中央偏上位置。应用三分法则，将人物头部放置在上方三分线附近，确保面部完整性和视觉平衡。",
+                details: "人脸检测置信度: 95.2%。建议裁剪区域避开画面边缘25%区域。采用中心构图，保持1:1比例的视觉和谐。",
+                crop_params: {
+                    original_size: [1200, 800],
+                    crop_box: { x: 225, y: 0, width: 750, height: 750 },
+                    output_size: [1080, 1080],
+                    crop_ratio: "1:1"
+                }
+            },
+            'instagram-story': {
+                reason: "风景照片的主要元素（山峰、天空）位于上方。为适应竖屏格式，重点保留天空和山脉的完整轮廓，同时包含部分前景草地以增加层次感。",
+                details: "天空占比调整至40%，山脉轮廓完整保留。前景草地作为视觉锚点。色彩平衡良好，无需特殊调整。",
+                crop_params: {
+                    original_size: [1600, 900],
+                    crop_box: { x: 300, y: 0, width: 1000, height: 1778 },
+                    output_size: [1080, 1920],
+                    crop_ratio: "9:16"
+                }
+            },
+            'tiktok': {
+                reason: "多人合影需要确保所有主要人物都包含在裁剪区域内。检测到4个人物主体，采用群体构图原则，保持人物间的相对位置关系。",
+                details: "人物检测数量: 4个。群体重心位于画面中央偏左。裁剪时保留10%的边缘空间避免人物被截断。",
+                crop_params: {
+                    original_size: [1400, 1000],
+                    crop_box: { x: 262, y: 0, width: 875, height: 1556 },
+                    output_size: [1080, 1920],
+                    crop_ratio: "9:16"
+                }
+            },
+            'linkedin-avatar': {
+                reason: "专业商务头像需要突出面部特征和职业形象。采用经典头像构图，人物居中，保留适当的肩部空间以显示正式着装。",
+                details: "面部特征清晰度: 优秀。职业着装识别: 正装套装。建议保留头部到胸部的标准商务头像比例。背景简洁度良好。",
+                crop_params: {
+                    original_size: [1000, 1200],
+                    crop_box: { x: 200, y: 150, width: 600, height: 600 },
+                    output_size: [400, 400],
+                    crop_ratio: "1:1"
+                }
+            },
+            'wechat-avatar': {
+                reason: "生活照片风格轻松自然，适合个人社交使用。保持人物的亲和力表达，同时包含部分背景装饰元素以增加趣味性。",
+                details: "表情自然度: 很好。背景装饰元素（花朵）增加视觉趣味。色彩温暖，符合个人头像的友好基调。",
+                crop_params: {
+                    original_size: [1100, 800],
+                    crop_box: { x: 250, y: 100, width: 600, height: 600 },
+                    output_size: [640, 640],
+                    crop_ratio: "1:1"
+                }
+            }
+        };
+
+        let testResults = {};
+        let allLogs = '';
+
+        // 日志函数
+        function log(testId, message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${message}`;
+            allLogs += logMessage + '\n';
+            
+            const logArea = document.getElementById(`log${testId}`);
+            if (logArea) {
+                logArea.textContent += logMessage + '\n';
+            }
+            console.log(`Test ${testId}: ${message}`);
+        }
+
+        // 更新状态
+        function updateStatus(testId, text, success = null) {
+            const statusEl = document.getElementById(`status${testId}`);
+            statusEl.textContent = text;
+            if (success === true) {
+                statusEl.style.background = '#d4edda';
+                statusEl.style.color = '#155724';
+            } else if (success === false) {
+                statusEl.style.background = '#f8d7da';
+                statusEl.style.color = '#721c24';
+            }
+        }
+
+        // 模拟GPT API调用
+        async function mockGPTAPICall(scene, imageType) {
+            // 模拟API延迟
+            await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+            
+            if (Math.random() < 0.1) {
+                // 10%概率模拟API错误
+                throw new Error('GPT API调用失败: 网络超时');
+            }
+            
+            return mockGPTResponses[scene];
+        }
+
+        // 验证裁剪参数
+        function validateCropParams(cropParams, scene) {
+            const { original_size, crop_box, output_size, crop_ratio } = cropParams;
+            
+            // 检查裁剪框是否在原图范围内
+            if (crop_box.x < 0 || crop_box.y < 0 || 
+                crop_box.x + crop_box.width > original_size[0] ||
+                crop_box.y + crop_box.height > original_size[1]) {
+                return { valid: false, error: '裁剪框超出原图边界' };
+            }
+            
+            // 检查输出比例
+            const expectedRatio = crop_ratio === '1:1' ? 1 : crop_ratio === '9:16' ? 9/16 : 1;
+            const actualRatio = output_size[0] / output_size[1];
+            
+            if (Math.abs(actualRatio - expectedRatio) > 0.01) {
+                return { valid: false, error: '输出比例不正确' };
+            }
+            
+            return { valid: true, message: '参数验证通过' };
+        }
+
+        // 运行单个测试
+        async function runTest(testId, scene, imageType) {
+            try {
+                updateStatus(testId, '测试中...');
+                document.getElementById(`btn${testId}`).disabled = true;
+                document.getElementById(`log${testId}`).style.display = 'block';
+                
+                log(testId, `🚀 开始测试: ${imageType} → ${scene}`);
+                
+                // 1. 模拟GPT-4.1分析
+                log(testId, '🤖 调用GPT-4.1 Vision API分析...');
+                const cropSolution = await mockGPTAPICall(scene, imageType);
+                
+                // 2. 验证裁剪参数
+                log(testId, '✂️ 验证裁剪参数...');
+                const validation = validateCropParams(cropSolution.crop_params, scene);
+                
+                if (!validation.valid) {
+                    throw new Error(`参数验证失败: ${validation.error}`);
+                }
+                
+                // 3. 显示结果
+                const resultArea = document.getElementById(`result${testId}`);
+                resultArea.style.display = 'block';
+                resultArea.className = 'result-area success';
+                resultArea.innerHTML = `
+                    <h4>🎉 测试成功!</h4>
+                    <p><strong>🤖 AI分析:</strong> ${cropSolution.reason}</p>
+                    <p><strong>📊 技术细节:</strong> ${cropSolution.details}</p>
+                    <p><strong>📏 裁剪参数:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>原始尺寸: ${cropSolution.crop_params.original_size[0]}×${cropSolution.crop_params.original_size[1]}</li>
+                        <li>裁剪区域: (${cropSolution.crop_params.crop_box.x}, ${cropSolution.crop_params.crop_box.y}) 
+                            ${cropSolution.crop_params.crop_box.width}×${cropSolution.crop_params.crop_box.height}</li>
+                        <li>输出尺寸: ${cropSolution.crop_params.output_size[0]}×${cropSolution.crop_params.output_size[1]}</li>
+                        <li>目标比例: ${cropSolution.crop_params.crop_ratio}</li>
+                    </ul>
+                    <p><strong>✅ 格式验证:</strong> ${validation.message}</p>
+                `;
+                
+                testResults[testId] = {
+                    success: true,
+                    scene: scene,
+                    imageType: imageType,
+                    result: cropSolution
+                };
+                
+                log(testId, `✅ 测试完成! 格式验证通过`);
+                updateStatus(testId, '测试成功', true);
+                
+            } catch (error) {
+                const resultArea = document.getElementById(`result${testId}`);
+                resultArea.style.display = 'block';
+                resultArea.className = 'result-area error';
+                resultArea.innerHTML = `
+                    <h4>❌ 测试失败</h4>
+                    <p><strong>错误信息:</strong> ${error.message}</p>
+                `;
+                
+                testResults[testId] = {
+                    success: false,
+                    scene: scene,
+                    imageType: imageType,
+                    error: error.message
+                };
+                
+                log(testId, `❌ 测试失败: ${error.message}`);
+                updateStatus(testId, '测试失败', false);
+                
+            } finally {
+                document.getElementById(`btn${testId}`).disabled = false;
+            }
+        }
+
+        // 运行所有测试
+        async function runAllTests() {
+            console.log('🚀 开始运行所有AI裁剪测试...');
+            
+            const tests = [
+                {id: 1, scene: 'instagram-post', type: '人像摄影'},
+                {id: 2, scene: 'instagram-story', type: '风景摄影'},
+                {id: 3, scene: 'tiktok', type: '多人合影'},
+                {id: 4, scene: 'linkedin-avatar', type: '商务头像'},
+                {id: 5, scene: 'wechat-avatar', type: '休闲生活'}
+            ];
+            
+            for (const test of tests) {
+                await runTest(test.id, test.scene, test.type);
+                await new Promise(resolve => setTimeout(resolve, 500)); // 500ms间隔
+            }
+            
+            // 显示测试总结
+            const successCount = Object.values(testResults).filter(r => r.success).length;
+            console.log(`🎉 测试完成! 成功: ${successCount}/5`);
+            
+            alert(`🎉 所有测试完成!\n成功: ${successCount}/5\n失败: ${5-successCount}/5`);
+        }
+
+        // 显示详细日志
+        function showLogs() {
+            const logWindow = window.open('', '_blank', 'width=800,height=600');
+            logWindow.document.write(`
+                <html>
+                <head><title>AI裁剪测试 - 详细日志</title></head>
+                <body style="font-family: monospace; background: #2c3e50; color: #ecf0f1; padding: 20px;">
+                <h2 style="color: #3498db;">🤖 AI裁剪测试详细日志</h2>
+                <pre>${allLogs}</pre>
+                </body>
+                </html>
+            `);
+        }
+
+        console.log('🎨 AI裁剪效果验证测试页面已加载');
+        console.log('📋 支持的测试场景:');
+        console.log('1. 人像摄影 → Instagram帖子 (1:1)');
+        console.log('2. 风景摄影 → Instagram故事 (9:16)');
+        console.log('3. 多人合影 → TikTok (9:16)');
+        console.log('4. 商务头像 → LinkedIn头像 (1:1)');
+        console.log('5. 休闲生活 → 微信头像 (1:1)');
+    </script>
+</body>
+</html>
