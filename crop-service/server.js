@@ -16,6 +16,9 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// 静态文件服务
+app.use(express.static(__dirname));
+
 // 速率限制
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15分钟
@@ -125,22 +128,7 @@ function validateAndFixCropParams(cropParams, originalWidth, originalHeight) {
   return { fixed, errors };
 }
 
-// 验证subject_anchor_hint参数
-function validateAnchorHint(anchorHint) {
-  const errors = [];
-  let fixed = { ...anchorHint };
-  
-  if (typeof fixed.x_norm !== 'number' || fixed.x_norm < 0 || fixed.x_norm > 1) {
-    errors.push('x_norm必须在[0,1]范围内');
-    fixed.x_norm = Math.max(0, Math.min(1, Number(fixed.x_norm) || 0.5));
-  }
-  if (typeof fixed.y_norm !== 'number' || fixed.y_norm < 0 || fixed.y_norm > 1) {
-    errors.push('y_norm必须在[0,1]范围内');
-    fixed.y_norm = Math.max(0, Math.min(1, Number(fixed.y_norm) || 0.5));
-  }
-  
-  return { fixed, errors };
-}
+// 注意：v0.5版本已移除subject_anchor_hint字段
 
 // GPT-4.1 Vision API调用（带参数验证和二次请求）
 async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode = 'aesthetic') {
@@ -151,12 +139,33 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
   let promptTemplate;
   try {
     promptTemplate = await fs.readFile(
-      path.join(__dirname, 'prompts', `v0.1-${mode}.txt`), 
+      path.join(__dirname, 'prompts', `v0.5-${mode}.txt`), 
       'utf-8'
     );
   } catch (error) {
-    console.warn('无法加载prompt文件，使用内置模板');
-    promptTemplate = `你是专业的图片裁剪专家。坐标原点为左上角，单位为像素。
+    console.warn('无法加载v0.5 prompt文件，尝试v0.4版本');
+    try {
+      promptTemplate = await fs.readFile(
+        path.join(__dirname, 'prompts', `v0.4-${mode}.txt`), 
+        'utf-8'
+      );
+    } catch (error2) {
+      console.warn('无法加载v0.4 prompt文件，尝试v0.3版本');
+      try {
+        promptTemplate = await fs.readFile(
+          path.join(__dirname, 'prompts', `v0.3-${mode}.txt`), 
+          'utf-8'
+        );
+      } catch (error3) {
+        console.warn('无法加载v0.3 prompt文件，尝试v0.2版本');
+        try {
+          promptTemplate = await fs.readFile(
+            path.join(__dirname, 'prompts', `v0.2-${mode}.txt`), 
+            'utf-8'
+          );
+        } catch (error4) {
+          console.warn('无法加载v0.2 prompt文件，使用内置模板');
+            promptTemplate = `你是专业的图片裁剪专家。坐标原点为左上角，单位为像素。
 **输入：** 原图尺寸 (${originalWidth}×${originalHeight})。
 **目标：** 让图片更美观、更有视觉冲击力。
 
@@ -177,6 +186,9 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
     "y_norm": 0.50
   }
 }`;
+        }
+      }
+    }
   }
   
   const prompt = promptTemplate
@@ -186,18 +198,18 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
   // 最多尝试2次请求
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      console.log(`[GPT] 第${attempt}次请求 - 图片尺寸: ${originalWidth}×${originalHeight}`);
+      console.log(`[GPT-5] 第${attempt}次请求 - 图片尺寸: ${originalWidth}×${originalHeight}`);
       
       const response = await axios.post('https://api.apiyi.com/v1/chat/completions', {
-        model: 'gpt-4.1-preview',
+        model: 'gpt-5-mini-2025-08-07',
         messages: [
+          {
+            role: 'system',
+            content: prompt
+          },
           {
             role: 'user',
             content: [
-              {
-                type: 'text',
-                text: prompt
-              },
               {
                 type: 'image_url',
                 image_url: {
@@ -211,25 +223,28 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
         temperature: 0.3
       }, {
         headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY || 'sk-cSkEKdy2yfQ5Lvlq10Db1c83823f4607Bb9a25751bE9Ac37'}`,
+          'Authorization': `Bearer sk-cSkEKdy2yfQ5Lvlq10Db1c83823f4607Bb9a25751bE9Ac37`,
           'Content-Type': 'application/json'
         }
       });
 
       const content = response.data.choices[0].message.content;
-      console.log(`[GPT] 原始响应长度: ${content.length}字符`);
+      console.log(`[GPT-5] 原始响应长度: ${content.length}字符`);
+      console.log(`[GPT-5] 原始响应内容:`, content);
       
       // 尝试提取JSON
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error('无法解析GPT响应中的JSON');
+        throw new Error('无法解析GPT-5响应中的JSON');
       }
       
+      console.log(`[GPT-5] 提取的JSON:`, jsonMatch[0]);
       const parsedResult = JSON.parse(jsonMatch[0]);
+      console.log(`[GPT-5] 解析后的对象:`, JSON.stringify(parsedResult, null, 2));
       
       // 验证必要字段是否存在
       if (!parsedResult.analysis || !parsedResult.crop_params) {
-        throw new Error('GPT响应缺少必要字段');
+        throw new Error('GPT-5响应缺少必要字段');
       }
       
       // 验证并修正crop_params
@@ -239,18 +254,9 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
         originalHeight
       );
       
-      // 验证并修正subject_anchor_hint
-      let anchorValidation = { fixed: { x_norm: 0.5, y_norm: 0.5 }, errors: [] };
-      if (parsedResult.subject_anchor_hint) {
-        anchorValidation = validateAnchorHint(parsedResult.subject_anchor_hint);
-      }
-      
       // 如果第一次请求参数有问题且尝试次数小于2，进行二次请求
-      if ((cropValidation.errors.length > 0 || anchorValidation.errors.length > 0) && attempt === 1) {
-        console.warn(`[GPT] 第${attempt}次请求参数有问题:`, [
-          ...cropValidation.errors,
-          ...anchorValidation.errors
-        ]);
+      if (cropValidation.errors.length > 0 && attempt === 1) {
+        console.warn(`[GPT] 第${attempt}次请求参数有问题:`, cropValidation.errors);
         console.log(`[GPT] 进行第二次请求尝试...`);
         continue; // 继续下一次循环
       }
@@ -259,18 +265,13 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
       if (cropValidation.errors.length > 0) {
         console.warn(`[GPT] 裁剪参数已修正:`, cropValidation.errors);
       }
-      if (anchorValidation.errors.length > 0) {
-        console.warn(`[GPT] 锚点参数已修正:`, anchorValidation.errors);
-      }
       
-      // 返回修正后的结果
+      // 返回修正后的结果（移除subject_anchor_hint字段）
       return {
         analysis: parsedResult.analysis,
         crop_params: cropValidation.fixed,
-        subject_anchor_hint: anchorValidation.fixed,
         validation_info: {
           crop_errors: cropValidation.errors,
-          anchor_errors: anchorValidation.errors,
           attempt_count: attempt
         }
       };
@@ -287,55 +288,43 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
   }
 }
 
-// 备用裁剪算法（包含subject_anchor_hint）
+// 备用裁剪算法（v0.5版本，移除subject_anchor_hint）
 function generateFallbackCrop(mode, originalWidth = 1080, originalHeight = 1350) {
   const aestheticCrops = [
     {
       analysis: {
-        "方案标题": "经典三分构图",
-        "效果": "突出主体，增强画面张力和视觉聚焦效果"
+        "方案标题": "上方留白聚焦",
+        "效果": "强化前景主体故事感。去除上方干扰元素，增加下方主体权重，远近对比更加明显。"
       },
       crop_params: {
         x: Math.floor(originalWidth * 0.1),
         y: Math.floor(originalHeight * 0.15),
         width: Math.floor(originalWidth * 0.8),
         height: Math.floor(originalHeight * 0.7)
-      },
-      subject_anchor_hint: {
-        x_norm: 0.67, // 右侧三分线
-        y_norm: 0.33  // 上部三分线
       }
     },
     {
       analysis: {
-        "方案标题": "黄金比例构图",
-        "效果": "营造和谐视觉节奏，提升整体美感和艺术性"
+        "方案标题": "紧密框架突出",
+        "效果": "突出中心主体的细节表达。裁掉边缘分散注意力的元素，主体占据画面核心区域，情绪传达更直接。"
       },
       crop_params: {
         x: Math.floor(originalWidth * 0.15),
         y: Math.floor(originalHeight * 0.1),
         width: Math.floor(originalWidth * 0.7),
         height: Math.floor(originalHeight * 0.8)
-      },
-      subject_anchor_hint: {
-        x_norm: 0.618, // 黄金比例点
-        y_norm: 0.382  // 黄金比例点
       }
     },
     {
       analysis: {
-        "方案标题": "居中稳定构图",
-        "效果": "平衡稳重，适合对称性主体展示"
+        "方案标题": "方形平衡取景",
+        "效果": "营造稳定的视觉节奏感。保持主体居中位置，去除多余边缘内容，整体画面更加紧凑统一。"
       },
       crop_params: {
         x: Math.floor(originalWidth * 0.2),
         y: Math.floor(originalHeight * 0.2),
         width: Math.floor(originalWidth * 0.6),
         height: Math.floor(originalHeight * 0.6)
-      },
-      subject_anchor_hint: {
-        x_norm: 0.5, // 正中心
-        y_norm: 0.5
       }
     }
   ];
@@ -603,6 +592,167 @@ app.get('/api/history', async (req, res) => {
   }
 });
 
+// 调试接口 - 支持自定义模型和提示词
+app.post('/api/analyze-debug', upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: '未上传图片文件' });
+    }
+
+    const { model, prompt } = req.body;
+    if (!model || !prompt) {
+      return res.status(400).json({ success: false, error: '缺少模型或提示词参数' });
+    }
+
+    console.log(`[调试模式] 使用模型: ${model}`);
+    console.log(`[调试模式] 提示词长度: ${prompt.length} 字符`);
+
+    // 获取图片信息
+    const imageBuffer = req.file.buffer;
+    const imageMetadata = await sharp(imageBuffer).metadata();
+    const { width: originalWidth, height: originalHeight } = imageMetadata;
+    
+    console.log(`[调试模式] 图片尺寸: ${originalWidth}×${originalHeight}`);
+
+    // 转换为base64
+    const imageBase64 = imageBuffer.toString('base64');
+    
+    // 替换提示词中的模板变量
+    const processedPrompt = prompt
+      .replace(/\$\{originalWidth\}/g, originalWidth)
+      .replace(/\$\{originalHeight\}/g, originalHeight);
+
+    // 调用AI分析
+    const result = await analyzeImageWithModel(imageBase64, processedPrompt, model, originalWidth, originalHeight);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        data: result.data,
+        metadata: {
+          model: model,
+          originalWidth,
+          originalHeight,
+          promptLength: processedPrompt.length
+        }
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: result.error,
+        metadata: {
+          model: model,
+          originalWidth,
+          originalHeight
+        }
+      });
+    }
+  } catch (error) {
+    console.error('[调试模式] 错误:', error);
+    res.status(500).json({
+      success: false,
+      error: `调试分析失败: ${error.message}`
+    });
+  }
+});
+
+// 通用AI分析函数
+async function analyzeImageWithModel(imageBase64, prompt, model, originalWidth, originalHeight) {
+  const axios = require('axios');
+  
+  // 最多尝试2次请求
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      console.log(`[${model}] 第${attempt}次请求 - 图片尺寸: ${originalWidth}×${originalHeight}`);
+      
+      const response = await axios.post('https://api.apiyi.com/v1/chat/completions', {
+        model: model,
+        messages: [
+          {
+            role: 'system',
+            content: prompt
+          },
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:image/jpeg;base64,${imageBase64}`
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 800,
+        temperature: 0.3
+      }, {
+        headers: {
+          'Authorization': `Bearer sk-cSkEKdy2yfQ5Lvlq10Db1c83823f4607Bb9a25751bE9Ac37`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 60000
+      });
+
+      const content = response.data.choices[0].message.content;
+      console.log(`[${model}] 原始响应长度: ${content.length}字符`);
+
+      // 提取JSON
+      const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+      if (!jsonMatch) {
+        // 尝试直接解析整个内容
+        try {
+          const result = JSON.parse(content.trim());
+          return validateAndReturnResult(result, originalWidth, originalHeight, model);
+        } catch {
+          throw new Error('AI响应中未找到有效的JSON格式数据');
+        }
+      }
+
+      const jsonStr = jsonMatch[1];
+      console.log(`[${model}] 提取的JSON: ${jsonStr.substring(0, 200)}...`);
+
+      const result = JSON.parse(jsonStr);
+      return validateAndReturnResult(result, originalWidth, originalHeight, model);
+
+    } catch (error) {
+      console.error(`[${model}] 第${attempt}次请求失败:`, error.message);
+      if (attempt === 2) {
+        return {
+          success: false,
+          error: `模型 ${model} 分析失败: ${error.message}`,
+          fallback: false
+        };
+      }
+    }
+  }
+}
+
+// 验证并返回结果
+function validateAndReturnResult(result, originalWidth, originalHeight, model) {
+  if (!result.crop_params || !result.analysis) {
+    throw new Error('响应格式不完整，缺少必要字段');
+  }
+
+  const { x, y, width, height } = result.crop_params;
+  
+  // 验证坐标
+  if (x < 0 || y < 0 || width < 100 || height < 100) {
+    throw new Error('裁剪参数无效：坐标或尺寸不符合要求');
+  }
+  
+  if (x + width > originalWidth || y + height > originalHeight) {
+    throw new Error('裁剪参数越界：超出原图范围');
+  }
+
+  console.log(`[${model}] 分析成功 - 方案: ${result.analysis.方案标题}`);
+  
+  return {
+    success: true,
+    data: result
+  };
+}
+
 // 错误处理中间件
 app.use((error, req, res, next) => {
   console.error('全局错误处理:', error);
@@ -631,6 +781,7 @@ async function startServer() {
     console.log(`📍 服务地址: http://localhost:${PORT}`);
     console.log(`🎨 美学裁剪: POST /api/crop/aesthetic`);
     console.log(`📦 批量处理: POST /api/crop/batch-aesthetic`);
+    console.log(`🐛 调试模式: POST /api/analyze-debug`);
     console.log(`📥 文件下载: GET /api/download/:filename`);
     console.log(`🔍 健康检查: GET /api/health`);
     console.log(`📋 处理历史: GET /api/history`);
