@@ -1,0 +1,90 @@
+{
+  "price": {
+    "title": "安くて透明な価格！",
+    "pricing": "価格",
+    "slogan": "フルスピードでスタート！",
+    "monthly_bill": "月額課金",
+    "annual_bill": "年額課金",
+    "annual_info": "年間課金時に請求されます",
+    "monthly_info": "月間課金時",
+    "mo": "/月",
+    "contact": "サポートチームにお問い合わせください。",
+    "contact_2": "課金なしでサブスクリプションをテストできます。",
+    "faq": "よくある質問",
+    "faq_detail": "よくある質問の包括的なFAQを閲覧して、一般的な問い合わせに対する迅速な回答を見つけてください。さらなるサポートが必要な場合は、お気軽にお問い合わせください。",
+    "signup": "登録",
+    "upgrade": "アップグレード",
+    "manage_subscription": "サブスクリプション管理",
+    "go_to_dashboard": "ダッシュボードへ",
+    "": ""
+  },
+  "marketing": {
+    "introducing": "SnapCropの紹介",
+    "title": "AIクロッピング、すべての写真に生命を吹き込む",
+    "sub_title": "3000万枚の画像で訓練された美学エンジン",
+    "get_started": "始める",
+    "view_on_github": "GitHubで見る",
+    "explore_product": "製品を探索",
+    "features": "機能",
+    "sub_features": "クラウドネイティブ：スタートアップのための技術の簡素化とコスト削減。",
+    "k8s_features": "高速でシンプルな開発",
+    "devops_features": "楽なアプリケーションデプロイ",
+    "price_features": "本番環境に費用効果的。",
+    "main_nav_features": "機能",
+    "main_nav_pricing": "価格",
+    "main_nav_products": "製品",
+    "main_nav_blog": "ブログ",
+    "main_nav_documentation": "ドキュメント",
+    "login": "ログイン",
+    "signup": "登録",
+    "": "",
+    "contributors": {
+      "contributors_desc": "人の貢献者がSnapCropをより強力にしました",
+      "developers_first": "以上の",
+      "developers_second": "人の開発者を支援"
+    }
+  },
+  "login": {
+    "title": "ログイン",
+    "subtitle": "アカウントにアクセス",
+    "email": "メール",
+    "password": "パスワード",
+    "signin": "サインイン",
+    "signup": "サインアップ",
+    "forgot": "パスワードをお忘れですか？"
+  },
+  "common": {
+    "title": "SnapCrop - AIクロップツール",
+    "description": "3000万枚の画像で訓練された美学エンジンを搭載したスマートAIクロップツール",
+    "home": "ホーム",
+    "about": "について",
+    "contact": "お問い合わせ",
+    "privacy": "プライバシー",
+    "terms": "利用規約"
+  },
+  "crop": {
+    "title": "写真のクロッピングを開始",
+    "subtitle": "JPEG、PNG、GIF、WebPサポート、最大50MB",
+    "upload_hint": "画像をここにドラッグするか、クリックしてアップロード",
+    "select_image": "画像を選択",
+    "processing": "AIが写真を分析中...",
+    "download": "クロップされた画像をダウンロード",
+    "reset": "新しいものをアップロード",
+    "share": "結果を共有"
+  },
+  "dropdown": {
+    "account": "アカウント",
+    "dashboard": "ダッシュボード",
+    "settings": "設定",
+    "logout": "ログアウト"
+  },
+  "crop": {
+    "title": "AIスマートクロップ",
+    "subtitle": "画像をアップロードし、AI技術を使用してインテリジェントにクロップし、完璧な構図を素早く取得",
+    "upload_hint": "画像をここにドラッグ&ドロップするか、クリックしてファイルを選択",
+    "select_image": "画像を選択",
+    "processing": "処理中...",
+    "download": "結果をダウンロード",
+    "reset": "リセット"
+  }
+}

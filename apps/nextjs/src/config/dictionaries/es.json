@@ -1,0 +1,81 @@
+{
+  "price": {
+    "title": "¡Precios baratos y transparentes!",
+    "pricing": "Precios",
+    "slogan": "¡Arranque a toda velocidad!",
+    "monthly_bill": "Facturación mensual",
+    "annual_bill": "Facturación anual",
+    "annual_info": "Se cobrará cuando se facture anualmente",
+    "monthly_info": "Cuando se facture mensualmente",
+    "mo": "/mes",
+    "contact": "Contacte con nuestro equipo de soporte.",
+    "contact_2": "Puede probar la suscripción sin ser cobrado.",
+    "faq": "Preguntas frecuentes",
+    "faq_detail": "Explore nuestras preguntas frecuentes completas para encontrar respuestas rápidas a consultas comunes. Si necesita más ayuda, no dude en contactarnos para asistencia personalizada.",
+    "signup": "Registrarse",
+    "upgrade": "Actualizar",
+    "manage_subscription": "Gestionar suscripción",
+    "go_to_dashboard": "Ir al panel",
+    "": ""
+  },
+  "marketing": {
+    "introducing": "Presentamos SnapCrop",
+    "title": "Herramienta de recorte AI inteligente",
+    "sub_title": "Recorte inteligente basado en IA con motor estético entrenado en 30 millones de imágenes.",
+    "get_started": "Comenzar",
+    "view_on_github": "Ver en GitHub",
+    "explore_product": "Explorar producto",
+    "features": "Características",
+    "sub_features": "Nativo en la nube: simplificando la tecnología y reduciendo costos para startups.",
+    "k8s_features": "Desarrollo rápido y simple",
+    "devops_features": "Despliegue de aplicaciones sin esfuerzo",
+    "price_features": "Rentable para entornos de producción.",
+    "main_nav_features": "Características",
+    "main_nav_pricing": "Precios",
+    "main_nav_products": "Productos",
+    "main_nav_blog": "Blog",
+    "main_nav_documentation": "Documentación",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "": "",
+    "contributors": {
+      "contributors_desc": "contribuidores hicieron SnapCrop más poderoso",
+      "developers_first": "Ayudó a más de ",
+      "developers_second": " desarrolladores"
+    }
+  },
+  "common": {
+    "title": "SnapCrop - Herramienta de Recorte AI",
+    "description": "Herramienta de recorte AI inteligente con motor estético entrenado en 30 millones de imágenes",
+    "home": "Inicio",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "privacy": "Privacidad",
+    "terms": "Términos"
+  },
+  "crop": {
+    "title": "Comenzar a recortar sus fotos",
+    "subtitle": "Soporta JPEG, PNG, GIF, WebP, máximo 50MB",
+    "upload_hint": "Arrastre la imagen aquí o haga clic para subir",
+    "select_image": "Seleccionar imagen",
+    "processing": "IA analizando su foto...",
+    "download": "Descargar imagen recortada",
+    "reset": "Subir nueva",
+    "share": "Compartir resultado"
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "subtitle": "Acceda a su cuenta",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "signin": "Iniciar sesión",
+    "signup": "Registrarse",
+    "forgot": "¿Olvidó su contraseña?"
+  },
+  "dropdown": {
+    "account": "Cuenta",
+    "dashboard": "Panel",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión"
+  }
+}
