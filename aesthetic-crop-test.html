@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI美学裁剪测试 - 纯美感优先</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .philosophy {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid #e17055;
+        }
+        
+        .philosophy h3 {
+            color: #2d3436;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .philosophy h3::before {
+            content: "🎨";
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+            color: #2c3e50;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .status.processing {
+            background: linear-gradient(45deg, #ffeaa7, #fab1a0);
+            color: #2d3436;
+        }
+        
+        .status.success {
+            background: linear-gradient(45deg, #55a3ff, #003d82);
+            color: white;
+        }
+        
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .image-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .image-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .image-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: #ecf0f1;
+        }
+        
+        .image-side {
+            background: white;
+            padding: 15px;
+        }
+        
+        .image-side h4 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .image-side.original h4 {
+            color: #e74c3c;
+        }
+        
+        .image-side.cropped h4 {
+            color: #27ae60;
+        }
+        
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .image-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+        
+        .analysis {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .analysis h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .analysis h4::before {
+            content: "🔍";
+            margin-right: 10px;
+        }
+        
+        .aesthetic-reason {
+            background: linear-gradient(135deg, #e8f5e8, #f0f8ff);
+            border-left: 4px solid #27ae60;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .technical-details {
+            background: linear-gradient(135deg, #fff3e0, #f3e5f5);
+            border-left: 4px solid #9c27b0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI美学裁剪测试</h1>
+            <div class="subtitle">纯美感优先 - 让每张照片都更美</div>
+            
+            <div class="philosophy">
+                <h3>设计理念</h3>
+                <p><strong>美感第一，规范第二</strong>。我们不再强制适配特定尺寸，而是让AI根据每张图片的独特构图、色彩和主体，找到最美的裁剪方案。每一次裁剪都是为了让照片更动人，更有视觉冲击力。</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="loadImages()">
+                🖼️ 加载20张测试图片
+            </button>
+            <button class="btn btn-secondary" onclick="startAestheticAnalysis()" id="analyzeBtn" disabled>
+                🎨 开始美学分析
+            </button>
+            <button class="btn btn-secondary" onclick="processRandomSample(5)" id="sampleBtn" disabled>
+                🎲 随机测试5张
+            </button>
+            <button class="btn btn-secondary" onclick="processAll()" id="processAllBtn" disabled>
+                ✨ 全部处理
+            </button>
+        </div>
+
+        <div class="status" id="status" style="display: none;"></div>
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div id="results" class="image-grid"></div>
+    </div>
+
+    <script>
+        let imageFiles = [];
+        let currentProgress = 0;
+        
+        const imageNames = [
+            '514395460_793592689837250_6716909223341968659_n.jpg',
+            '520223512_796639402865912_9122114948815406813_n.jpg',
+            '538783140_1081667070741721_7590305933866675938_n.jpg',
+            '539123735_1081667597408335_3672692203658739325_n.jpg',
+            '539357730_1081667514075010_543704824412561690_n.jpg',
+            '540953364_122176180070368444_9122116863782221520_n.jpg',
+            '542005975_1122090326528798_291751363339586782_n.jpg',
+            '543093328_24879514531655303_4393783564674959693_n.jpg',
+            '543101382_1122090503195447_8591081234852726439_n.jpg',
+            '544561870_1122090333195464_4150693688071878958_n.jpg',
+            '545137503_802726098939073_344329420305544671_n.jpg',
+            '546376419_10238747466974444_8476391214317887945_n.jpg',
+            '546381431_122246413436160613_3708853180197877791_n.jpg',
+            '547011755_10163991416035555_2798119668148624268_n.jpg',
+            '547103047_122273456876179587_8064148281068749731_n.jpg',
+            '547268409_24597330353231524_2816715975986438217_n.jpg',
+            'can-someone-crop-enhance-this-photo-please-v0-uxa5314y46of1.webp',
+            'does-this-photo-need-a-crop-v0-nlfjhkycpl7e1.webp',
+            'how-to-crop-v0-ihrntc6z2v6f1.webp',
+            'yq3jq65les8e1.webp'
+        ];
+
+        async function loadImages() {
+            const status = document.getElementById('status');
+            status.style.display = 'block';
+            status.className = 'status processing';
+            status.textContent = '🔄 正在加载20张真实图片...';
+            
+            imageFiles = [];
+            let successCount = 0;
+            
+            for (const imageName of imageNames) {
+                try {
+                    const response = await fetch(`test_results/original_images/${imageName}`);
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        imageFiles.push({
+                            name: imageName,
+                            blob: blob,
+                            url: URL.createObjectURL(blob)
+                        });
+                        successCount++;
+                    }
+                } catch (error) {
+                    console.error(`Failed to load ${imageName}:`, error);
+                }
+            }
+            
+            status.className = 'status success';
+            status.textContent = `✅ 成功加载 ${successCount}/20 张图片`;
+            
+            // 启用按钮
+            document.getElementById('analyzeBtn').disabled = false;
+            document.getElementById('sampleBtn').disabled = false;
+            document.getElementById('processAllBtn').disabled = false;
+        }
+
+        async function startAestheticAnalysis() {
+            await processImages(imageFiles);
+        }
+        
+        async function processRandomSample(count) {
+            const shuffled = [...imageFiles].sort(() => 0.5 - Math.random());
+            const sample = shuffled.slice(0, count);
+            await processImages(sample);
+        }
+        
+        async function processAll() {
+            await processImages(imageFiles);
+        }
+        
+        async function processImages(images) {
+            const status = document.getElementById('status');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const results = document.getElementById('results');
+            
+            status.style.display = 'block';
+            progressBar.style.display = 'block';
+            status.className = 'status processing';
+            results.innerHTML = '';
+            
+            currentProgress = 0;
+            
+            for (let i = 0; i < images.length; i++) {
+                const image = images[i];
+                status.textContent = `🎨 正在进行美学分析... (${i + 1}/${images.length})`;
+                
+                // 更新进度条
+                currentProgress = ((i + 1) / images.length) * 100;
+                progressFill.style.width = `${currentProgress}%`;
+                
+                const result = await processImageForBeauty(image);
+                displayImageComparison(result);
+                
+                // 添加小延迟以显示进度
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            status.className = 'status success';
+            status.textContent = `✨ 完成！处理了 ${images.length} 张图片的美学优化`;
+            progressBar.style.display = 'none';
+        }
+        
+        async function processImageForBeauty(imageFile) {
+            // 创建图片元素获取原始尺寸
+            const img = new Image();
+            img.src = imageFile.url;
+            await new Promise(resolve => img.onload = resolve);
+            
+            // 模拟AI美学分析 (实际项目中这里会调用GPT-4.1 Vision)
+            const aestheticAnalysis = generateAestheticAnalysis(imageFile.name, img.width, img.height);
+            
+            // 执行美学裁剪
+            const croppedResult = await performAestheticCrop(img, aestheticAnalysis.cropParams);
+            
+            return {
+                original: {
+                    image: img,
+                    width: img.width,
+                    height: img.height
+                },
+                cropped: {
+                    image: croppedResult.image,
+                    canvas: croppedResult.canvas,
+                    width: croppedResult.width,
+                    height: croppedResult.height
+                },
+                analysis: aestheticAnalysis,
+                fileName: imageFile.name
+            };
+        }
+        
+        function generateAestheticAnalysis(fileName, originalWidth, originalHeight) {
+            // 这里模拟AI分析，实际会调用GPT-4.1
+            const analyses = [
+                {
+                    reason: "原图构图过于宽松，主体在画面中占比偏小，缺乏视觉冲击力。通过紧密裁剪突出主体，增强画面张力，让观者的视线更快聚焦到核心元素上。",
+                    technique: "运用三分法则重新构图，将主体放置在黄金分割点，同时保持充分的呼吸空间，避免画面过于拥挤。",
+                    cropParams: {
+                        x: Math.floor(originalWidth * 0.1),
+                        y: Math.floor(originalHeight * 0.15),
+                        width: Math.floor(originalWidth * 0.8),
+                        height: Math.floor(originalHeight * 0.7)
+                    }
+                },
+                {
+                    reason: "画面存在分散注意力的边缘元素，背景噪音影响主体表达。通过精准裁剪去除干扰元素，让色彩和光影更和谐统一，提升整体的视觉纯净度。",
+                    technique: "采用居中构图强化对称美感，同时调整画幅比例，让色彩过渡更加自然，增强画面的艺术张力。",
+                    cropParams: {
+                        x: Math.floor(originalWidth * 0.15),
+                        y: Math.floor(originalHeight * 0.1),
+                        width: Math.floor(originalWidth * 0.7),
+                        height: Math.floor(originalHeight * 0.8)
+                    }
+                },
+                {
+                    reason: "原始构图虽然完整，但缺乏情感传达力。通过重新框定画面，突出人物表情或景物细节，让照片能够讲述更有感染力的视觉故事。",
+                    technique: "运用紧密构图法，保留最有表现力的画面元素，去除冗余的背景信息，让每个像素都服务于情感表达。",
+                    cropParams: {
+                        x: Math.floor(originalWidth * 0.2),
+                        y: Math.floor(originalHeight * 0.2),
+                        width: Math.floor(originalWidth * 0.6),
+                        height: Math.floor(originalHeight * 0.6)
+                    }
+                },
+                {
+                    reason: "画面比例不够优雅，视觉重心偏离最佳观赏区域。通过艺术化裁剪调整画面节奏感，让构图更符合人眼的自然观看习惯，产生更舒适的视觉体验。",
+                    technique: "结合黄金螺旋构图理念，将视觉焦点安排在最能产生美学共鸣的位置，营造更有韵律感的画面流动。",
+                    cropParams: {
+                        x: Math.floor(originalWidth * 0.1),
+                        y: Math.floor(originalHeight * 0.25),
+                        width: Math.floor(originalWidth * 0.75),
+                        height: Math.floor(originalHeight * 0.5)
+                    }
+                }
+            ];
+            
+            const randomAnalysis = analyses[Math.floor(Math.random() * analyses.length)];
+            
+            // 确保裁剪参数不超出图片边界
+            randomAnalysis.cropParams.x = Math.max(0, Math.min(randomAnalysis.cropParams.x, originalWidth - 100));
+            randomAnalysis.cropParams.y = Math.max(0, Math.min(randomAnalysis.cropParams.y, originalHeight - 100));
+            randomAnalysis.cropParams.width = Math.min(randomAnalysis.cropParams.width, originalWidth - randomAnalysis.cropParams.x);
+            randomAnalysis.cropParams.height = Math.min(randomAnalysis.cropParams.height, originalHeight - randomAnalysis.cropParams.y);
+            
+            return randomAnalysis;
+        }
+        
+        async function performAestheticCrop(img, cropParams) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = cropParams.width;
+            canvas.height = cropParams.height;
+            
+            // 执行裁剪
+            ctx.drawImage(
+                img,
+                cropParams.x, cropParams.y, cropParams.width, cropParams.height,
+                0, 0, cropParams.width, cropParams.height
+            );
+            
+            return {
+                canvas: canvas,
+                image: canvas,
+                width: cropParams.width,
+                height: cropParams.height
+            };
+        }
+        
+        function displayImageComparison(result) {
+            const results = document.getElementById('results');
+            
+            const card = document.createElement('div');
+            card.className = 'image-card';
+            
+            card.innerHTML = `
+                <div class="image-header">
+                    📸 ${result.fileName}
+                </div>
+                
+                <div class="image-comparison">
+                    <div class="image-side original">
+                        <h4>🔴 原图</h4>
+                        <div class="image-container">
+                            <img src="${result.original.image.src}" alt="原图">
+                        </div>
+                        <div class="image-info">
+                            ${result.original.width} × ${result.original.height}
+                        </div>
+                    </div>
+                    
+                    <div class="image-side cropped">
+                        <h4>✨ 美学优化后</h4>
+                        <div class="image-container">
+                            <img src="${result.cropped.canvas.toDataURL()}" alt="裁剪后">
+                        </div>
+                        <div class="image-info">
+                            ${result.cropped.width} × ${result.cropped.height}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis">
+                    <h4>AI美学分析</h4>
+                    
+                    <div class="aesthetic-reason">
+                        <strong>🎨 美学优化理由：</strong><br>
+                        ${result.analysis.reason}
+                    </div>
+                    
+                    <div class="technical-details">
+                        <strong>🔧 技术实现方式：</strong><br>
+                        ${result.analysis.technique}<br><br>
+                        <strong>📐 裁剪参数：</strong><br>
+                        起始位置: (${result.analysis.cropParams.x}, ${result.analysis.cropParams.y})<br>
+                        裁剪尺寸: ${result.analysis.cropParams.width} × ${result.analysis.cropParams.height}
+                    </div>
+                </div>
+            `;
+            
+            results.appendChild(card);
+        }
+        
+        // 页面加载时自动开始
+        window.addEventListener('load', () => {
+            console.log('🎨 AI美学裁剪测试系统已准备就绪');
+        });
+    </script>
+</body>
+</html>

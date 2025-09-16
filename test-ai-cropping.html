@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI裁剪效果验证测试</title>
+    <link rel="stylesheet" href="css/app-style.css">
+    <style>
+        .test-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .test-case { 
+            background: white; 
+            margin: 30px 0; 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+        }
+        .test-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
+        .test-title { color: #2c3e50; font-size: 1.3em; margin: 0; }
+        .test-status { 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 0.85em; 
+            font-weight: 600;
+        }
+        .status-pending { background: #ffeaa7; color: #d63031; }
+        .status-testing { background: #74b9ff; color: white; }
+        .status-success { background: #00b894; color: white; }
+        .status-error { background: #e17055; color: white; }
+        .test-images { display: flex; gap: 20px; margin: 20px 0; }
+        .image-box { 
+            flex: 1; 
+            text-align: center; 
+            padding: 15px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+        }
+        .original-image { border-color: #74b9ff; }
+        .cropped-image { border-color: #00b894; }
+        .test-button { 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover { transform: translateY(-2px); }
+        .test-button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .log-area { 
+            background: #2c3e50; 
+            color: #ecf0f1; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: 'Courier New', monospace; 
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        canvas { max-width: 100%; border-radius: 8px; }
+        .gpt-response { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-left: 4px solid #667eea; 
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center; color: #2c3e50;">🤖 AI裁剪效果验证测试</h1>
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 40px;">
+            使用GPT-4.1 Vision API测试5个不同场景的智能裁剪效果
+        </p>
+
+        <!-- 测试案例1: Instagram帖子 -->
+        <div class="test-case">
+            <div class="test-header">
+                <h3 class="test-title">📸 测试1: 人像摄影 → Instagram帖子 (1:1)</h3>
+                <span class="test-status status-pending" id="status1">待测试</span>
+            </div>
+            <div class="test-images">
+                <div class="image-box original-image">
+                    <h4>原始图片 (1200×800)</h4>
+                    <canvas id="original1" width="300" height="200"></canvas>
+                </div>
+                <div class="image-box cropped-image">
+                    <h4>AI裁剪结果 (1:1)</h4>
+                    <canvas id="cropped1" width="200" height="200"></canvas>
+                </div>
+            </div>
+            <button class="test-button" onclick="runTest(1, 'instagram-post')" id="btn1">开始测试</button>
+            <div class="gpt-response" id="response1" style="display: none;"></div>
+            <div class="log-area" id="log1"></div>
+        </div>
+
+        <!-- 测试案例2: Instagram故事 -->
+        <div class="test-case">
+            <div class="test-header">
+                <h3 class="test-title">🏞️ 测试2: 风景照片 → Instagram故事 (9:16)</h3>
+                <span class="test-status status-pending" id="status2">待测试</span>
+            </div>
+            <div class="test-images">
+                <div class="image-box original-image">
+                    <h4>原始图片 (1600×900)</h4>
+                    <canvas id="original2" width="300" height="169"></canvas>
+                </div>
+                <div class="image-box cropped-image">
+                    <h4>AI裁剪结果 (9:16)</h4>
+                    <canvas id="cropped2" width="180" height="320"></canvas>
+                </div>
+            </div>
+            <button class="test-button" onclick="runTest(2, 'instagram-story')" id="btn2">开始测试</button>
+            <div class="gpt-response" id="response2" style="display: none;"></div>
+            <div class="log-area" id="log2"></div>
+        </div>
+
+        <!-- 测试案例3: TikTok -->
+        <div class="test-case">
+            <div class="test-header">
+                <h3 class="test-title">👥 测试3: 多人合影 → TikTok (9:16)</h3>
+                <span class="test-status status-pending" id="status3">待测试</span>
+            </div>
+            <div class="test-images">
+                <div class="image-box original-image">
+                    <h4>原始图片 (1400×1000)</h4>
+                    <canvas id="original3" width="280" height="200"></canvas>
+                </div>
+                <div class="image-box cropped-image">
+                    <h4>AI裁剪结果 (9:16)</h4>
+                    <canvas id="cropped3" width="180" height="320"></canvas>
+                </div>
+            </div>
+            <button class="test-button" onclick="runTest(3, 'tiktok')" id="btn3">开始测试</button>
+            <div class="gpt-response" id="response3" style="display: none;"></div>
+            <div class="log-area" id="log3"></div>
+        </div>
+
+        <!-- 测试案例4: LinkedIn头像 -->
+        <div class="test-case">
+            <div class="test-header">
+                <h3 class="test-title">💼 测试4: 商务头像 → LinkedIn头像 (1:1)</h3>
+                <span class="test-status status-pending" id="status4">待测试</span>
+            </div>
+            <div class="test-images">
+                <div class="image-box original-image">
+                    <h4>原始图片 (1000×1200)</h4>
+                    <canvas id="original4" width="167" height="200"></canvas>
+                </div>
+                <div class="image-box cropped-image">
+                    <h4>AI裁剪结果 (1:1)</h4>
+                    <canvas id="cropped4" width="200" height="200"></canvas>
+                </div>
+            </div>
+            <button class="test-button" onclick="runTest(4, 'linkedin-avatar')" id="btn4">开始测试</button>
+            <div class="gpt-response" id="response4" style="display: none;"></div>
+            <div class="log-area" id="log4"></div>
+        </div>
+
+        <!-- 测试案例5: 微信头像 -->
+        <div class="test-case">
+            <div class="test-header">
+                <h3 class="test-title">😊 测试5: 生活照片 → 微信头像 (1:1)</h3>
+                <span class="test-status status-pending" id="status5">待测试</span>
+            </div>
+            <div class="test-images">
+                <div class="image-box original-image">
+                    <h4>原始图片 (1100×800)</h4>
+                    <canvas id="original5" width="275" height="200"></canvas>
+                </div>
+                <div class="image-box cropped-image">
+                    <h4>AI裁剪结果 (1:1)</h4>
+                    <canvas id="cropped5" width="200" height="200"></canvas>
+                </div>
+            </div>
+            <button class="test-button" onclick="runTest(5, 'wechat-avatar')" id="btn5">开始测试</button>
+            <div class="gpt-response" id="response5" style="display: none;"></div>
+            <div class="log-area" id="log5"></div>
+        </div>
+
+        <!-- 全部测试按钮 -->
+        <div style="text-align: center; margin: 40px 0;">
+            <button class="test-button" onclick="runAllTests()" style="font-size: 1.1em; padding: 15px 30px;">
+                🚀 运行所有测试
+            </button>
+        </div>
+    </div>
+
+    <!-- 加载核心脚本 -->
+    <script src="js/platform-specs.js"></script>
+    <script src="js/gpt4-vision-api.js"></script>
+    <script src="js/image-cropper.js"></script>
+
+    <script>
+        // 初始化GPT API和裁剪引擎
+        const gptAPI = new GPT4VisionAPI();
+        let cropEngines = {};
+
+        // 日志函数
+        function log(testId, message) {
+            const logArea = document.getElementById(`log${testId}`);
+            const timestamp = new Date().toLocaleTimeString();
+            logArea.innerHTML += `[${timestamp}] ${message}\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+            console.log(`Test ${testId}: ${message}`);
+        }
+
+        // 更新状态
+        function updateStatus(testId, status, text) {
+            const statusEl = document.getElementById(`status${testId}`);
+            statusEl.className = `test-status status-${status}`;
+            statusEl.textContent = text;
+        }
+
+        // 生成测试图片
+        function generateTestImage(testId) {
+            const canvas = document.getElementById(`original${testId}`);
+            const ctx = canvas.getContext('2d');
+            
+            // 根据测试ID生成不同类型的图片
+            switch(testId) {
+                case 1: return drawPortraitImage(ctx, canvas.width, canvas.height);
+                case 2: return drawLandscapeImage(ctx, canvas.width, canvas.height);
+                case 3: return drawGroupImage(ctx, canvas.width, canvas.height);
+                case 4: return drawBusinessImage(ctx, canvas.width, canvas.height);
+                case 5: return drawCasualImage(ctx, canvas.width, canvas.height);
+            }
+        }
+
+        // 人像图片
+        function drawPortraitImage(ctx, w, h) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#E0F6FF');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+            
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.5, h*0.4, Math.min(w,h)*0.15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#4169E1';
+            ctx.fillRect(w*0.4, h*0.5, w*0.2, h*0.35);
+            
+            return canvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        // 风景图片
+        function drawLandscapeImage(ctx, w, h) {
+            // 天空
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, h*0.6);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(1, '#B0E0E6');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, w, h*0.6);
+            
+            // 山脉
+            ctx.fillStyle = '#8B7355';
+            ctx.beginPath();
+            ctx.moveTo(0, h*0.6);
+            ctx.lineTo(w*0.3, h*0.3);
+            ctx.lineTo(w*0.7, h*0.2);
+            ctx.lineTo(w, h*0.45);
+            ctx.lineTo(w, h*0.6);
+            ctx.fill();
+            
+            // 草地
+            ctx.fillStyle = '#90EE90';
+            ctx.fillRect(0, h*0.6, w, h*0.4);
+            
+            // 太阳
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(w*0.8, h*0.2, Math.min(w,h)*0.06, 0, Math.PI * 2);
+            ctx.fill();
+            
+            return canvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        // 群体图片
+        function drawGroupImage(ctx, w, h) {
+            ctx.fillStyle = '#F5F5DC';
+            ctx.fillRect(0, 0, w, h);
+            
+            const people = [
+                {x: w*0.2, y: h*0.4, color: '#FFB07A'},
+                {x: w*0.4, y: h*0.35, color: '#DEB887'},
+                {x: w*0.6, y: h*0.38, color: '#F0E68C'},
+                {x: w*0.8, y: h*0.42, color: '#FFB07A'}
+            ];
+            
+            people.forEach(person => {
+                ctx.fillStyle = person.color;
+                ctx.beginPath();
+                ctx.arc(person.x, person.y, Math.min(w,h)*0.08, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#4169E1';
+                ctx.fillRect(person.x - w*0.05, person.y + Math.min(w,h)*0.06, w*0.1, h*0.25);
+            });
+            
+            return canvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        // 商务图片
+        function drawBusinessImage(ctx, w, h) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, '#36454F');
+            gradient.addColorStop(1, '#2F4F4F');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+            
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.5, h*0.3, Math.min(w,h)*0.12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#000080';
+            ctx.fillRect(w*0.38, h*0.4, w*0.24, h*0.4);
+            
+            ctx.fillStyle = '#DC143C';
+            ctx.fillRect(w*0.47, h*0.4, w*0.06, h*0.25);
+            
+            return canvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        // 休闲图片
+        function drawCasualImage(ctx, w, h) {
+            ctx.fillStyle = '#FFE4E1';
+            ctx.fillRect(0, 0, w, h);
+            
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.45, h*0.4, Math.min(w,h)*0.1, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#FF6347';
+            ctx.fillRect(w*0.35, h*0.48, w*0.2, h*0.3);
+            
+            // 装饰花朵
+            ctx.fillStyle = '#FF1493';
+            for(let i = 0; i < 6; i++) {
+                const x = w*0.1 + Math.random() * w*0.8;
+                const y = h*0.1 + Math.random() * h*0.25;
+                ctx.beginPath();
+                ctx.arc(x, y, Math.min(w,h)*0.02, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            return canvas.toDataURL('image/jpeg', 0.9);
+        }
+
+        // 运行单个测试
+        async function runTest(testId, scene) {
+            try {
+                updateStatus(testId, 'testing', '测试中...');
+                document.getElementById(`btn${testId}`).disabled = true;
+                
+                log(testId, `🚀 开始测试: ${scene}`);
+                
+                // 1. 生成测试图片
+                log(testId, '📷 生成测试图片...');
+                const imageDataURL = generateTestImage(testId);
+                
+                // 2. 转换为File对象
+                const response = await fetch(imageDataURL);
+                const blob = await response.blob();
+                const file = new File([blob], `test${testId}.jpg`, { type: 'image/jpeg' });
+                
+                // 3. 调用GPT-4.1分析
+                log(testId, '🤖 调用GPT-4.1 Vision API分析...');
+                const specs = getSpecsByScene(scene);
+                const optimizedImage = await gptAPI.optimizeImageForAPI(file);
+                const cropSolution = await gptAPI.analyzeCropSolution(scene, specs, optimizedImage);
+                
+                // 4. 显示GPT响应
+                document.getElementById(`response${testId}`).style.display = 'block';
+                document.getElementById(`response${testId}`).innerHTML = `
+                    <h4>🤖 GPT-4.1 分析结果:</h4>
+                    <p><strong>推理:</strong> ${cropSolution.reason}</p>
+                    <p><strong>技术细节:</strong> ${cropSolution.details}</p>
+                    <p><strong>裁剪参数:</strong> ${JSON.stringify(cropSolution.crop_params, null, 2)}</p>
+                `;
+                
+                // 5. 执行裁剪
+                log(testId, '✂️ 执行Canvas裁剪...');
+                const croppedCanvas = document.getElementById(`cropped${testId}`);
+                const cropEngine = new ImageCropEngine(croppedCanvas);
+                
+                await cropEngine.loadImage(file);
+                const result = await cropEngine.executeCropFromJSON(cropSolution, scene);
+                
+                log(testId, `✅ 测试完成! 格式验证: ${result.validation.valid ? '通过' : '失败'}`);
+                updateStatus(testId, 'success', '测试成功');
+                
+            } catch (error) {
+                log(testId, `❌ 测试失败: ${error.message}`);
+                updateStatus(testId, 'error', '测试失败');
+                console.error(`Test ${testId} error:`, error);
+            } finally {
+                document.getElementById(`btn${testId}`).disabled = false;
+            }
+        }
+
+        // 运行所有测试
+        async function runAllTests() {
+            console.log('🚀 开始运行所有AI裁剪测试...');
+            
+            const tests = [
+                {id: 1, scene: 'instagram-post'},
+                {id: 2, scene: 'instagram-story'},
+                {id: 3, scene: 'tiktok'},
+                {id: 4, scene: 'linkedin-avatar'},
+                {id: 5, scene: 'wechat-avatar'}
+            ];
+            
+            for (const test of tests) {
+                await runTest(test.id, test.scene);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1秒间隔
+            }
+            
+            console.log('🎉 所有测试完成!');
+        }
+
+        // 页面加载完成后生成所有原始图片
+        window.onload = function() {
+            console.log('🎨 初始化AI裁剪测试页面...');
+            for (let i = 1; i <= 5; i++) {
+                generateTestImage(i);
+                log(i, `原始测试图片已生成`);
+            }
+            console.log('✅ 测试页面初始化完成');
+        };
+    </script>
+</body>
+</html>

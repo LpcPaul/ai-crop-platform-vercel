@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI图片裁剪工具 - 调试测试</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover { background: #0056b3; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+        
+        #test-canvas {
+            border: 1px solid #ddd;
+            max-width: 100%;
+            margin: 10px 0;
+        }
+        
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .file-input {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 AI图片裁剪工具 - 调试测试页面</h1>
+    
+    <div class="test-section">
+        <h2>📋 系统检查</h2>
+        <button class="test-button" onclick="runSystemCheck()">运行系统检查</button>
+        <div id="system-check-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🗂️ 平台规格数据库测试</h2>
+        <button class="test-button" onclick="testPlatformSpecs()">测试平台规格</button>
+        <div id="platform-specs-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🖼️ 图像处理测试</h2>
+        <div class="file-input">
+            <label>选择测试图片: </label>
+            <input type="file" id="test-image-input" accept="image/*">
+        </div>
+        <button class="test-button" onclick="testImageOptimization()">测试图像优化</button>
+        <button class="test-button" onclick="testCanvasCropping()">测试Canvas裁剪</button>
+        <canvas id="test-canvas" width="300" height="300"></canvas>
+        <div id="image-test-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🤖 GPT-4.1 API测试</h2>
+        <div class="file-input">
+            <label>选择测试图片: </label>
+            <input type="file" id="gpt-test-image" accept="image/*">
+        </div>
+        <select id="test-scene">
+            <option value="instagram-post">Instagram帖子</option>
+            <option value="instagram-story">Instagram故事</option>
+            <option value="tiktok">TikTok视频</option>
+        </select>
+        <button class="test-button" onclick="testGPTAPI()">测试GPT-4.1分析</button>
+        <div id="gpt-test-log" class="log"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 完整工作流程测试</h2>
+        <div class="file-input">
+            <label>选择测试图片: </label>
+            <input type="file" id="workflow-test-image" accept="image/*">
+        </div>
+        <select id="workflow-scene">
+            <option value="instagram-post">Instagram帖子 (1:1)</option>
+            <option value="instagram-story">Instagram故事 (9:16)</option>
+            <option value="tiktok">TikTok视频 (9:16)</option>
+            <option value="linkedin-avatar">LinkedIn头像 (1:1)</option>
+        </select>
+        <button class="test-button" onclick="testCompleteWorkflow()">测试完整流程</button>
+        <canvas id="workflow-canvas" width="400" height="400"></canvas>
+        <div id="workflow-log" class="log"></div>
+        <div id="workflow-result"></div>
+    </div>
+
+    <!-- 加载核心模块 -->
+    <script src="js/platform-specs.js"></script>
+    <script src="js/gpt4-vision-api.js"></script>
+    <script src="js/image-cropper.js"></script>
+
+    <script>
+        let testAPI = null;
+        let testCropEngine = null;
+
+        // 系统检查
+        function runSystemCheck() {
+            const log = document.getElementById('system-check-log');
+            log.innerHTML = '';
+            
+            function addLog(message, type = 'info') {
+                log.innerHTML += `<div class="${type}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+            }
+
+            addLog('🔍 开始系统检查...');
+
+            // 检查核心类是否加载
+            try {
+                if (typeof PLATFORM_SPECS !== 'undefined') {
+                    addLog('✅ 平台规格数据库已加载', 'success');
+                    addLog(`   支持 ${Object.keys(PLATFORM_SPECS).length} 个场景`, 'info');
+                } else {
+                    addLog('❌ 平台规格数据库未加载', 'error');
+                }
+
+                if (typeof GPT4VisionAPI !== 'undefined') {
+                    addLog('✅ GPT-4.1 Vision API类已加载', 'success');
+                    testAPI = new GPT4VisionAPI();
+                    addLog(`   API地址: ${testAPI.apiBase}`, 'info');
+                } else {
+                    addLog('❌ GPT-4.1 Vision API类未加载', 'error');
+                }
+
+                if (typeof ImageCropEngine !== 'undefined') {
+                    addLog('✅ 图像裁剪引擎已加载', 'success');
+                } else {
+                    addLog('❌ 图像裁剪引擎未加载', 'error');
+                }
+
+                // 检查浏览器API支持
+                if (typeof FileReader !== 'undefined') {
+                    addLog('✅ FileReader API支持', 'success');
+                } else {
+                    addLog('❌ FileReader API不支持', 'error');
+                }
+
+                if (typeof HTMLCanvasElement !== 'undefined') {
+                    addLog('✅ Canvas API支持', 'success');
+                } else {
+                    addLog('❌ Canvas API不支持', 'error');
+                }
+
+                addLog('🎉 系统检查完成', 'success');
+
+            } catch (error) {
+                addLog(`❌ 系统检查失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 测试平台规格
+        function testPlatformSpecs() {
+            const log = document.getElementById('platform-specs-log');
+            log.innerHTML = '';
+            
+            function addLog(message, type = 'info') {
+                log.innerHTML += `<div class="${type}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+            }
+
+            try {
+                addLog('🧪 测试平台规格数据库...');
+
+                // 测试基础功能
+                const instagramSpecs = getSpecsByScene('instagram-post');
+                if (instagramSpecs) {
+                    addLog('✅ Instagram规格获取成功', 'success');
+                    addLog(`   比例: ${instagramSpecs.ratio}, 推荐尺寸: ${instagramSpecs.recommended_size.join('×')}`, 'info');
+                } else {
+                    addLog('❌ Instagram规格获取失败', 'error');
+                }
+
+                // 测试比例解析
+                const ratio = parseRatio('16:9');
+                addLog(`✅ 比例解析测试: 16:9 = ${ratio.toFixed(3)}`, 'success');
+
+                // 测试格式验证
+                const validation = validateOutputSize([1080, 1080], 'instagram-post');
+                if (validation.valid) {
+                    addLog('✅ 格式验证测试通过', 'success');
+                    addLog(`   准确度: ${validation.format_accuracy}`, 'info');
+                } else {
+                    addLog(`❌ 格式验证失败: ${validation.error}`, 'error');
+                }
+
+                // 测试场景分类
+                const socialScenes = getScenesByCategory('social');
+                addLog(`✅ 社交媒体场景: ${socialScenes.length}个`, 'success');
+
+                addLog('🎉 平台规格测试完成', 'success');
+
+            } catch (error) {
+                addLog(`❌ 平台规格测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 测试图像优化
+        async function testImageOptimization() {
+            const log = document.getElementById('image-test-log');
+            const fileInput = document.getElementById('test-image-input');
+            
+            function addLog(message, type = 'info') {
+                log.innerHTML += `<div class="${type}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+            }
+
+            if (!fileInput.files[0]) {
+                addLog('❌ 请先选择测试图片', 'error');
+                return;
+            }
+
+            try {
+                if (!testAPI) testAPI = new GPT4VisionAPI();
+
+                addLog('🔧 开始图像优化测试...');
+                
+                const file = fileInput.files[0];
+                addLog(`📁 原始图片: ${file.name}, 大小: ${(file.size/1024/1024).toFixed(2)}MB`, 'info');
+
+                const optimizedImage = await testAPI.optimizeImageForAPI(file);
+                
+                // 计算压缩后的大小
+                const base64Length = optimizedImage.length;
+                const compressedSize = (base64Length * 0.75) / 1024 / 1024; // 大约的字节大小
+                
+                addLog(`✅ 图像优化完成`, 'success');
+                addLog(`   压缩后大小: ~${compressedSize.toFixed(2)}MB`, 'info');
+                addLog(`   压缩比例: ${((file.size/1024/1024)/compressedSize).toFixed(1)}:1`, 'info');
+
+            } catch (error) {
+                addLog(`❌ 图像优化失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 测试Canvas裁剪
+        async function testCanvasCropping() {
+            const log = document.getElementById('image-test-log');
+            const fileInput = document.getElementById('test-image-input');
+            const canvas = document.getElementById('test-canvas');
+            
+            function addLog(message, type = 'info') {
+                log.innerHTML += `<div class="${type}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+            }
+
+            if (!fileInput.files[0]) {
+                addLog('❌ 请先选择测试图片', 'error');
+                return;
+            }
+
+            try {
+                addLog('✂️ 开始Canvas裁剪测试...');
+
+                testCropEngine = new ImageCropEngine(canvas);
+                await testCropEngine.loadImage(fileInput.files[0]);
+
+                // 模拟裁剪参数（居中正方形裁剪）
+                const mockCropSolution = {
+                    reason: "测试正方形裁剪\\n效果：居中裁剪为正方形，用于测试Canvas功能。",
+                    details: "测试裁剪参数：\\n\\n目标比例：1:1\\n裁切方式：居中裁剪\\n导出尺寸：300×300",
+                    crop_params: {
+                        original_size: [testCropEngine.originalImage.width, testCropEngine.originalImage.height],
+                        crop_box: {
+                            x: 0,
+                            y: 0,
+                            width: Math.min(testCropEngine.originalImage.width, testCropEngine.originalImage.height),
+                            height: Math.min(testCropEngine.originalImage.width, testCropEngine.originalImage.height)
+                        },
+                        output_size: [300, 300],
+                        crop_ratio: "1:1"
+                    }
+                };
+
+                const result = await testCropEngine.executeCropFromJSON(mockCropSolution, 'square');
+
+                addLog('✅ Canvas裁剪测试完成', 'success');
+                addLog(`   输出尺寸: ${result.croppedImage.size.width}×${result.croppedImage.size.height}`, 'info');
+                addLog(`   格式验证: ${result.validation.valid ? '通过' : '失败'}`, result.validation.valid ? 'success' : 'error');
+
+            } catch (error) {
+                addLog(`❌ Canvas裁剪测试失败: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        // 测试GPT-4.1 API
+        async function testGPTAPI() {
+            const log = document.getElementById('gpt-test-log');
+            const fileInput = document.getElementById('gpt-test-image');
+            const sceneSelect = document.getElementById('test-scene');
+            
+            function addLog(message, type = 'info') {
+                log.innerHTML += `<div class="${type}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+            }
+
+            if (!fileInput.files[0]) {
+                addLog('❌ 请先选择测试图片', 'error');
+                return;
+            }
+
+            try {
+                if (!testAPI) testAPI = new GPT4VisionAPI();
+
+                const scene = sceneSelect.value;
+                const specs = getSpecsByScene(scene);
+                
+                addLog(`🤖 开始GPT-4.1 API测试...`, 'info');
+                addLog(`   场景: ${scene}`, 'info');
+                addLog(`   规格: ${specs.ratio}, ${specs.recommended_size.join('×')}`, 'info');
+
+                // 优化图片
+                addLog('🔧 优化图片中...', 'info');
+                const optimizedImage = await testAPI.optimizeImageForAPI(fileInput.files[0]);
+                
+                // 调用GPT API
+                addLog('📡 调用GPT-4.1 Vision API...', 'info');
+                addLog('⏳ 请稍等，GPT-4.1正在分析图片...', 'warning');
+                
+                const cropSolution = await testAPI.analyzeCropSolution(scene, specs, optimizedImage);
+
+                addLog('✅ GPT-4.1分析完成!', 'success');
+                addLog(`📝 裁剪理由: ${cropSolution.reason.replace(/\\n/g, ' ')}`, 'info');
+                addLog(`📊 裁剪参数: ${JSON.stringify(cropSolution.crop_params, null, 2)}`, 'info');
+
+            } catch (error) {
+                addLog(`❌ GPT-4.1 API测试失败: ${error.message}`, 'error');
+                console.error('GPT API Error:', error);
+            }
+        }
+
+        // 测试完整工作流程
+        async function testCompleteWorkflow() {
+            const log = document.getElementById('workflow-log');
+            const resultDiv = document.getElementById('workflow-result');
+            const fileInput = document.getElementById('workflow-test-image');
+            const sceneSelect = document.getElementById('workflow-scene');
+            const canvas = document.getElementById('workflow-canvas');
+            
+            function addLog(message, type = 'info') {
+                log.innerHTML += `<div class="${type}">[${new Date().toLocaleTimeString()}] ${message}</div>`;
+            }
+
+            if (!fileInput.files[0]) {
+                addLog('❌ 请先选择测试图片', 'error');
+                return;
+            }
+
+            try {
+                const scene = sceneSelect.value;
+                const specs = getSpecsByScene(scene);
+                
+                addLog('🚀 开始完整工作流程测试...', 'info');
+                addLog(`   场景: ${specs.name}`, 'info');
+
+                // 1. 初始化组件
+                if (!testAPI) testAPI = new GPT4VisionAPI();
+                testCropEngine = new ImageCropEngine(canvas);
+
+                // 2. 图像优化
+                addLog('🔧 步骤1: 优化图像...', 'info');
+                const optimizedImage = await testAPI.optimizeImageForAPI(fileInput.files[0]);
+
+                // 3. GPT-4.1分析
+                addLog('🤖 步骤2: GPT-4.1分析...', 'info');
+                const cropSolution = await testAPI.analyzeCropSolution(scene, specs, optimizedImage);
+
+                // 4. 加载原图到裁剪引擎
+                addLog('🖼️ 步骤3: 加载图像到裁剪引擎...', 'info');
+                await testCropEngine.loadImage(fileInput.files[0]);
+
+                // 5. 执行裁剪
+                addLog('✂️ 步骤4: 执行裁剪...', 'info');
+                const cropResult = await testCropEngine.executeCropFromJSON(cropSolution, scene);
+
+                // 6. 显示结果
+                addLog('🎉 完整工作流程测试成功!', 'success');
+                
+                resultDiv.innerHTML = `
+                    <h3>📊 测试结果</h3>
+                    <p><strong>裁剪理由:</strong><br>${cropSolution.reason.replace(/\\n/g, '<br>')}</p>
+                    <p><strong>技术说明:</strong><br>${cropSolution.details.replace(/\\n/g, '<br>')}</p>
+                    <p><strong>格式验证:</strong> ${cropResult.validation.valid ? '✅ 通过' : '❌ 失败'}</p>
+                    <p><strong>输出尺寸:</strong> ${cropResult.cropParams.output_size.join('×')}</p>
+                    <button class="test-button" onclick="downloadTestResult()">下载测试结果</button>
+                `;
+
+                // 存储结果供下载
+                window.testResult = { cropEngine: testCropEngine, scene, cropParams: cropResult.cropParams };
+
+            } catch (error) {
+                addLog(`❌ 完整工作流程测试失败: ${error.message}`, 'error');
+                console.error('Workflow Error:', error);
+            }
+        }
+
+        // 下载测试结果
+        async function downloadTestResult() {
+            if (!window.testResult) {
+                alert('没有可下载的测试结果');
+                return;
+            }
+
+            try {
+                const { cropEngine, scene, cropParams } = window.testResult;
+                const blob = await cropEngine.generateBlob('png', 1.0);
+                const filename = `test-${scene}-${cropParams.output_size.join('x')}-${Date.now()}.png`;
+                
+                downloadCroppedImage(blob, filename);
+                console.log('✅ 测试结果下载完成');
+                
+            } catch (error) {
+                console.error('❌ 下载失败:', error);
+                alert('下载失败: ' + error.message);
+            }
+        }
+
+        // 页面加载完成后自动运行系统检查
+        window.addEventListener('load', () => {
+            setTimeout(runSystemCheck, 1000);
+        });
+    </script>
+</body>
+</html>

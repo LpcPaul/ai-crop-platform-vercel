@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试图片生成器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-case {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-image {
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        canvas {
+            display: block;
+            max-width: 100%;
+        }
+        h1 { color: #333; text-align: center; }
+        h3 { color: #666; margin-bottom: 10px; }
+        .description { color: #888; font-size: 0.9em; margin-bottom: 15px; }
+        .download-btn {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        .download-btn:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🎨 AI裁剪测试图片生成器</h1>
+    <p style="text-align: center; color: #666;">生成5个不同场景的测试图片，验证GPT-4.1自动裁剪效果</p>
+
+    <div class="test-case">
+        <h3>测试案例 1: 人像摄影 → Instagram帖子 (1:1)</h3>
+        <div class="description">模拟专业人像照，测试人脸识别和构图优化</div>
+        <div class="test-image">
+            <canvas id="canvas1" width="1200" height="800"></canvas>
+        </div>
+        <button class="download-btn" onclick="downloadImage('canvas1', 'test1-portrait-instagram.jpg')">下载测试图1</button>
+    </div>
+
+    <div class="test-case">
+        <h3>测试案例 2: 风景照片 → Instagram故事 (9:16)</h3>
+        <div class="description">模拟横向风景照，测试竖屏适配和重点保留</div>
+        <div class="test-image">
+            <canvas id="canvas2" width="1600" height="900"></canvas>
+        </div>
+        <button class="download-btn" onclick="downloadImage('canvas2', 'test2-landscape-story.jpg')">下载测试图2</button>
+    </div>
+
+    <div class="test-case">
+        <h3>测试案例 3: 多人合影 → TikTok (9:16)</h3>
+        <div class="description">模拟群体照片，测试多主体识别和动态构图</div>
+        <div class="test-image">
+            <canvas id="canvas3" width="1400" height="1000"></canvas>
+        </div>
+        <button class="download-btn" onclick="downloadImage('canvas3', 'test3-group-tiktok.jpg')">下载测试图3</button>
+    </div>
+
+    <div class="test-case">
+        <h3>测试案例 4: 商务头像 → LinkedIn头像 (1:1)</h3>
+        <div class="description">模拟商务场景，测试专业头像裁剪精度</div>
+        <div class="test-image">
+            <canvas id="canvas4" width="1000" height="1200"></canvas>
+        </div>
+        <button class="download-btn" onclick="downloadImage('canvas4', 'test4-business-linkedin.jpg')">下载测试图4</button>
+    </div>
+
+    <div class="test-case">
+        <h3>测试案例 5: 生活照片 → 微信头像 (1:1)</h3>
+        <div class="description">模拟日常生活场景，测试休闲照片的美学优化</div>
+        <div class="test-image">
+            <canvas id="canvas5" width="1100" height="800"></canvas>
+        </div>
+        <button class="download-btn" onclick="downloadImage('canvas5', 'test5-casual-wechat.jpg')">下载测试图5</button>
+    </div>
+
+    <script>
+        // 生成测试图片的函数
+        function createTestImage(canvasId, scenario) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // 清空画布
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            switch(scenario) {
+                case 'portrait':
+                    drawPortraitScene(ctx, canvas.width, canvas.height);
+                    break;
+                case 'landscape':
+                    drawLandscapeScene(ctx, canvas.width, canvas.height);
+                    break;
+                case 'group':
+                    drawGroupScene(ctx, canvas.width, canvas.height);
+                    break;
+                case 'business':
+                    drawBusinessScene(ctx, canvas.width, canvas.height);
+                    break;
+                case 'casual':
+                    drawCasualScene(ctx, canvas.width, canvas.height);
+                    break;
+            }
+        }
+
+        // 人像场景
+        function drawPortraitScene(ctx, w, h) {
+            // 背景渐变
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#E0F6FF');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+            
+            // 模拟人像（圆形头部）
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.5, h*0.4, Math.min(w,h)*0.12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 身体
+            ctx.fillStyle = '#4169E1';
+            ctx.fillRect(w*0.42, h*0.5, w*0.16, h*0.3);
+            
+            // 添加文字标识
+            ctx.fillStyle = '#333';
+            ctx.font = `${Math.min(w,h)*0.03}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('专业人像摄影', w*0.5, h*0.9);
+            ctx.fillText('1200×800 → 1:1裁剪测试', w*0.5, h*0.94);
+        }
+
+        // 风景场景
+        function drawLandscapeScene(ctx, w, h) {
+            // 天空
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, h*0.6);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(1, '#B0E0E6');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, w, h*0.6);
+            
+            // 山脉
+            ctx.fillStyle = '#8B7355';
+            ctx.beginPath();
+            ctx.moveTo(0, h*0.6);
+            ctx.lineTo(w*0.3, h*0.3);
+            ctx.lineTo(w*0.6, h*0.45);
+            ctx.lineTo(w*0.9, h*0.2);
+            ctx.lineTo(w, h*0.4);
+            ctx.lineTo(w, h*0.6);
+            ctx.fill();
+            
+            // 草地
+            ctx.fillStyle = '#90EE90';
+            ctx.fillRect(0, h*0.6, w, h*0.4);
+            
+            // 太阳
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(w*0.85, h*0.15, Math.min(w,h)*0.05, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#333';
+            ctx.font = `${Math.min(w,h)*0.025}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('横向风景摄影', w*0.5, h*0.85);
+            ctx.fillText('1600×900 → 9:16裁剪测试', w*0.5, h*0.9);
+        }
+
+        // 群体场景
+        function drawGroupScene(ctx, w, h) {
+            // 背景
+            ctx.fillStyle = '#F5F5DC';
+            ctx.fillRect(0, 0, w, h);
+            
+            // 绘制多个人物
+            const people = [
+                {x: w*0.25, y: h*0.45, color: '#FFB07A'},
+                {x: w*0.4, y: h*0.4, color: '#DEB887'},
+                {x: w*0.6, y: h*0.42, color: '#F0E68C'},
+                {x: w*0.75, y: h*0.47, color: '#FFB07A'}
+            ];
+            
+            people.forEach(person => {
+                // 头部
+                ctx.fillStyle = person.color;
+                ctx.beginPath();
+                ctx.arc(person.x, person.y, Math.min(w,h)*0.06, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 身体
+                ctx.fillStyle = '#4169E1';
+                ctx.fillRect(person.x - w*0.04, person.y + Math.min(w,h)*0.04, w*0.08, h*0.2);
+            });
+            
+            ctx.fillStyle = '#333';
+            ctx.font = `${Math.min(w,h)*0.025}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('多人合影场景', w*0.5, h*0.85);
+            ctx.fillText('1400×1000 → 9:16裁剪测试', w*0.5, h*0.9);
+        }
+
+        // 商务场景
+        function drawBusinessScene(ctx, w, h) {
+            // 正式背景
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, '#36454F');
+            gradient.addColorStop(1, '#2F4F4F');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+            
+            // 商务人士
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.5, h*0.35, Math.min(w,h)*0.1, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 西装
+            ctx.fillStyle = '#000080';
+            ctx.fillRect(w*0.4, h*0.42, w*0.2, h*0.35);
+            
+            // 领带
+            ctx.fillStyle = '#DC143C';
+            ctx.fillRect(w*0.485, h*0.42, w*0.03, h*0.2);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = `${Math.min(w,h)*0.025}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('商务专业头像', w*0.5, h*0.85);
+            ctx.fillText('1000×1200 → 1:1裁剪测试', w*0.5, h*0.9);
+        }
+
+        // 休闲场景
+        function drawCasualScene(ctx, w, h) {
+            // 温馨背景
+            ctx.fillStyle = '#FFE4E1';
+            ctx.fillRect(0, 0, w, h);
+            
+            // 休闲人物
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.45, h*0.4, Math.min(w,h)*0.08, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 休闲服装
+            ctx.fillStyle = '#FF6347';
+            ctx.fillRect(w*0.38, h*0.46, w*0.14, h*0.25);
+            
+            // 装饰元素（花朵）
+            ctx.fillStyle = '#FF1493';
+            for(let i = 0; i < 8; i++) {
+                const x = w*0.1 + Math.random() * w*0.8;
+                const y = h*0.1 + Math.random() * h*0.2;
+                ctx.beginPath();
+                ctx.arc(x, y, Math.min(w,h)*0.015, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.fillStyle = '#333';
+            ctx.font = `${Math.min(w,h)*0.025}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText('休闲生活照片', w*0.5, h*0.85);
+            ctx.fillText('1100×800 → 1:1裁剪测试', w*0.5, h*0.9);
+        }
+
+        // 下载图片函数
+        function downloadImage(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+        }
+
+        // 页面加载完成后生成所有测试图片
+        window.onload = function() {
+            createTestImage('canvas1', 'portrait');
+            createTestImage('canvas2', 'landscape');
+            createTestImage('canvas3', 'group');
+            createTestImage('canvas4', 'business');
+            createTestImage('canvas5', 'casual');
+            
+            console.log('🎨 测试图片生成完成');
+            console.log('准备测试以下场景:');
+            console.log('1. 人像摄影 → Instagram帖子 (1:1)');
+            console.log('2. 风景照片 → Instagram故事 (9:16)');
+            console.log('3. 多人合影 → TikTok (9:16)');
+            console.log('4. 商务头像 → LinkedIn头像 (1:1)');
+            console.log('5. 生活照片 → 微信头像 (1:1)');
+        };
+    </script>
+</body>
+</html>

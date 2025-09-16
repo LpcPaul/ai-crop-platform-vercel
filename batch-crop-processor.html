@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批量Canvas裁剪处理器</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f7fa; 
+        }
+        .processor-section { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+            margin: 20px 0;
+        }
+        .progress-bar { 
+            width: 100%; 
+            height: 20px; 
+            background: #e9ecef; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            margin: 20px 0; 
+        }
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(135deg, #28a745, #20c997); 
+            transition: width 0.3s ease; 
+            width: 0%; 
+        }
+        .image-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; 
+            margin: 30px 0; 
+        }
+        .crop-item { 
+            border: 1px solid #dee2e6; 
+            border-radius: 10px; 
+            padding: 15px; 
+            background: #f8f9fa; 
+        }
+        .crop-preview { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; 
+        }
+        .preview-canvas { 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            max-width: 100px; 
+            max-height: 100px; 
+        }
+        .crop-info { 
+            flex: 1; 
+            font-size: 0.9em; 
+        }
+        .status-badge { 
+            padding: 4px 8px; 
+            border-radius: 12px; 
+            font-size: 0.8em; 
+            font-weight: 600; 
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-processing { background: #cce5ff; color: #0056b3; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .process-btn { 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin: 10px;
+        }
+        .process-btn:hover { transform: translateY(-2px); }
+        .process-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        h1 { text-align: center; color: #2c3e50; }
+        .summary { text-align: center; color: #7f8c8d; margin-bottom: 30px; }
+        .log-area { 
+            background: #2c3e50; 
+            color: #ecf0f1; 
+            padding: 20px; 
+            border-radius: 10px; 
+            font-family: 'Courier New', monospace; 
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        .download-all { 
+            background: linear-gradient(135deg, #28a745, #20c997);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Canvas批量裁剪处理器 v1.0</h1>
+    <p class="summary">对20张真实图片执行Canvas裁剪，生成标准化的裁剪结果</p>
+
+    <div class="processor-section">
+        <h2>📊 处理进度</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p id="progress-text">准备开始处理...</p>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="process-btn" onclick="startBatchProcessing()" id="start-btn">
+                🚀 开始批量裁剪处理
+            </button>
+            <button class="process-btn download-all" onclick="downloadAllResults()" id="download-btn" disabled>
+                📦 批量下载裁剪结果
+            </button>
+        </div>
+    </div>
+
+    <div class="processor-section">
+        <h2>📋 处理日志</h2>
+        <div class="log-area" id="log-area"></div>
+    </div>
+
+    <div class="processor-section">
+        <h2>🖼️ 裁剪结果预览</h2>
+        <div class="image-grid" id="results-grid"></div>
+    </div>
+
+    <script>
+        // 真实图片配置
+        const imageConfigs = [
+            { file: '514395460_793592689837250_6716909223341968659_n.jpg', scene: 'instagram-story', target: [1080, 1920] },
+            { file: '520223512_796639402865912_9122114948815406813_n.jpg', scene: 'instagram-post', target: [1080, 1080] },
+            { file: '538783140_1081667070741721_7590305933866675938_n.jpg', scene: 'twitter-avatar', target: [400, 400] },
+            { file: '539123735_1081667597408335_3672692203658739325_n.jpg', scene: 'linkedin-avatar', target: [400, 400] },
+            { file: '539357730_1081667514075010_543704824412561690_n.jpg', scene: 'wechat-avatar', target: [640, 640] },
+            { file: '540953364_122176180070368444_9122116863782221520_n.jpg', scene: 'youtube-thumbnail', target: [1280, 720] },
+            { file: '542005975_1122090326528798_291751363339586782_n.jpg', scene: 'facebook-cover', target: [1200, 630] },
+            { file: '543093328_24879514531655303_4393783564674959693_n.jpg', scene: 'instagram-post', target: [1080, 1080] },
+            { file: '543101382_1122090503195447_8591081234852726439_n.jpg', scene: 'tiktok', target: [1080, 1920] },
+            { file: '544561870_1122090333195464_4150693688071878958_n.jpg', scene: 'instagram-story', target: [1080, 1920] },
+            { file: '545137503_802726098939073_344329420305544671_n.jpg', scene: 'youtube-thumbnail', target: [1280, 720] },
+            { file: '546376419_10238747466974444_8476391214317887945_n.jpg', scene: 'facebook-cover', target: [1200, 630] },
+            { file: '546381431_122246413436160613_3708853180197877791_n.jpg', scene: 'twitter-avatar', target: [400, 400] },
+            { file: '547011755_10163991416035555_2798119668148624268_n.jpg', scene: 'linkedin-avatar', target: [400, 400] },
+            { file: '547103047_122273456876179587_8064148281068749731_n.jpg', scene: 'instagram-post', target: [1080, 1080] },
+            { file: '547268409_24597330353231524_2816715975986438217_n.jpg', scene: 'wechat-avatar', target: [640, 640] },
+            { file: 'can-someone-crop-enhance-this-photo-please-v0-uxa5314y46of1.webp', scene: 'tiktok', target: [1080, 1920] },
+            { file: 'does-this-photo-need-a-crop-v0-nlfjhkycpl7e1.webp', scene: 'instagram-story', target: [1080, 1920] },
+            { file: 'how-to-crop-v0-ihrntc6z2v6f1.webp', scene: 'youtube-thumbnail', target: [1280, 720] },
+            { file: 'yq3jq65les8e1.webp', scene: 'twitter-avatar', target: [400, 400] }
+        ];
+
+        let processedResults = [];
+        let currentProcessing = 0;
+
+        // 日志函数
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('log-area');
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'processing' ? '🔄' : 'ℹ️';
+            
+            logArea.innerHTML += `[${timestamp}] ${icon} ${message}\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+            
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        // 更新进度
+        function updateProgress(current, total) {
+            const percentage = (current / total) * 100;
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+            document.getElementById('progress-text').textContent = 
+                `处理进度: ${current}/${total} (${Math.round(percentage)}%)`;
+        }
+
+        // 计算智能裁剪参数
+        function calculateSmartCrop(originalWidth, originalHeight, targetWidth, targetHeight) {
+            const originalRatio = originalWidth / originalHeight;
+            const targetRatio = targetWidth / targetHeight;
+            
+            let cropX = 0, cropY = 0, cropWidth = originalWidth, cropHeight = originalHeight;
+            
+            if (originalRatio > targetRatio) {
+                // 原图更宽，需要裁剪左右
+                cropWidth = Math.floor(originalHeight * targetRatio);
+                cropX = Math.floor((originalWidth - cropWidth) / 2);
+            } else {
+                // 原图更高，需要裁剪上下
+                cropHeight = Math.floor(originalWidth / targetRatio);
+                cropY = Math.floor((originalHeight - cropHeight) / 2);
+            }
+            
+            return { x: cropX, y: cropY, width: cropWidth, height: cropHeight };
+        }
+
+        // 处理单张图片
+        async function processSingleImage(config, index) {
+            log(`开始处理图片 ${index + 1}: ${config.file}`, 'processing');
+            
+            try {
+                // 1. 加载原图
+                const response = await fetch(`test_results/original_images/${config.file}`);
+                if (!response.ok) {
+                    throw new Error(`加载失败: HTTP ${response.status}`);
+                }
+                const blob = await response.blob();
+                
+                // 2. 创建Image对象
+                const img = new Image();
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                    img.src = URL.createObjectURL(blob);
+                });
+                
+                log(`图片加载成功: ${img.width}×${img.height}`, 'info');
+                
+                // 3. 计算裁剪参数
+                const cropParams = calculateSmartCrop(
+                    img.width, img.height,
+                    config.target[0], config.target[1]
+                );
+                
+                log(`裁剪参数: (${cropParams.x},${cropParams.y}) ${cropParams.width}×${cropParams.height}`, 'info');
+                
+                // 4. 执行Canvas裁剪
+                const canvas = document.createElement('canvas');
+                canvas.width = config.target[0];
+                canvas.height = config.target[1];
+                const ctx = canvas.getContext('2d');
+                
+                // 清空Canvas
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 执行裁剪
+                ctx.drawImage(
+                    img,
+                    cropParams.x, cropParams.y, cropParams.width, cropParams.height,
+                    0, 0, config.target[0], config.target[1]
+                );
+                
+                // 5. 生成结果
+                const croppedDataURL = canvas.toDataURL('image/jpeg', 0.9);
+                const croppedBlob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, 'image/jpeg', 0.9);
+                });
+                
+                // 6. 生成文件名
+                const sceneMap = {
+                    'instagram-post': 'ig_post',
+                    'instagram-story': 'ig_story',
+                    'tiktok': 'tiktok',
+                    'linkedin-avatar': 'linkedin',
+                    'wechat-avatar': 'wechat',
+                    'youtube-thumbnail': 'youtube',
+                    'facebook-cover': 'facebook',
+                    'twitter-avatar': 'twitter'
+                };
+                
+                const outputFilename = `${index + 1}_${sceneMap[config.scene] || config.scene}_${config.target[0]}x${config.target[1]}.jpg`;
+                
+                // 7. 保存结果
+                const result = {
+                    index: index + 1,
+                    originalFile: config.file,
+                    scene: config.scene,
+                    targetSize: config.target,
+                    cropParams,
+                    outputFilename,
+                    dataURL: croppedDataURL,
+                    blob: croppedBlob,
+                    canvas: canvas.cloneNode(),
+                    originalSize: [img.width, img.height]
+                };
+                
+                processedResults[index] = result;
+                log(`✅ 图片 ${index + 1} 处理完成: ${outputFilename}`, 'success');
+                
+                // 8. 显示预览
+                displayResult(result);
+                
+                // 清理内存
+                URL.revokeObjectURL(img.src);
+                
+                return result;
+                
+            } catch (error) {
+                log(`❌ 图片 ${index + 1} 处理失败: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // 显示处理结果
+        function displayResult(result) {
+            const grid = document.getElementById('results-grid');
+            
+            const item = document.createElement('div');
+            item.className = 'crop-item';
+            item.innerHTML = `
+                <div class="crop-preview">
+                    <canvas class="preview-canvas" width="80" height="80"></canvas>
+                    <div class="crop-info">
+                        <strong>${result.index}. ${result.scene}</strong><br>
+                        <small>原图: ${result.originalSize[0]}×${result.originalSize[1]}</small><br>
+                        <small>输出: ${result.targetSize[0]}×${result.targetSize[1]}</small><br>
+                        <small>${result.outputFilename}</small><br>
+                        <span class="status-badge status-success">处理完成</span>
+                    </div>
+                </div>
+            `;
+            
+            grid.appendChild(item);
+            
+            // 绘制预览
+            const previewCanvas = item.querySelector('.preview-canvas');
+            const previewCtx = previewCanvas.getContext('2d');
+            
+            // 计算预览尺寸
+            const maxSize = 80;
+            const scale = Math.min(maxSize / result.targetSize[0], maxSize / result.targetSize[1]);
+            const previewWidth = result.targetSize[0] * scale;
+            const previewHeight = result.targetSize[1] * scale;
+            
+            previewCanvas.width = previewWidth;
+            previewCanvas.height = previewHeight;
+            previewCtx.drawImage(result.canvas, 0, 0, previewWidth, previewHeight);
+        }
+
+        // 开始批量处理
+        async function startBatchProcessing() {
+            const startBtn = document.getElementById('start-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            
+            startBtn.disabled = true;
+            processedResults = [];
+            currentProcessing = 0;
+            
+            document.getElementById('results-grid').innerHTML = '';
+            
+            log('🚀 开始批量Canvas裁剪处理...', 'processing');
+            log(`📊 总计 ${imageConfigs.length} 张图片待处理`, 'info');
+            
+            const startTime = Date.now();
+            
+            try {
+                for (let i = 0; i < imageConfigs.length; i++) {
+                    currentProcessing = i + 1;
+                    updateProgress(currentProcessing, imageConfigs.length);
+                    
+                    await processSingleImage(imageConfigs[i], i);
+                    
+                    // 短暂延迟避免浏览器卡顿
+                    if (i < imageConfigs.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+                }
+                
+                const endTime = Date.now();
+                const duration = ((endTime - startTime) / 1000).toFixed(1);
+                
+                log(`🎉 批量处理完成! 耗时: ${duration}秒`, 'success');
+                log(`📊 成功处理: ${processedResults.filter(r => r).length}/${imageConfigs.length} 张图片`, 'success');
+                
+                downloadBtn.disabled = false;
+                generateProcessingReport();
+                
+            } catch (error) {
+                log(`❌ 批量处理异常: ${error.message}`, 'error');
+            } finally {
+                startBtn.disabled = false;
+                updateProgress(imageConfigs.length, imageConfigs.length);
+            }
+        }
+
+        // 生成处理报告
+        function generateProcessingReport() {
+            const successful = processedResults.filter(r => r).length;
+            const failed = imageConfigs.length - successful;
+            
+            log('📋 处理报告:', 'info');
+            log(`✅ 成功: ${successful} 张`, 'success');
+            log(`❌ 失败: ${failed} 张`, failed > 0 ? 'error' : 'info');
+            log(`📐 输出格式分布:`, 'info');
+            
+            const formatCount = {};
+            processedResults.forEach(result => {
+                if (result) {
+                    const format = `${result.targetSize[0]}×${result.targetSize[1]}`;
+                    formatCount[format] = (formatCount[format] || 0) + 1;
+                }
+            });
+            
+            Object.entries(formatCount).forEach(([format, count]) => {
+                log(`   • ${format}: ${count} 张`, 'info');
+            });
+        }
+
+        // 批量下载结果
+        async function downloadAllResults() {
+            log('📦 开始批量下载裁剪结果...', 'processing');
+            
+            const validResults = processedResults.filter(r => r);
+            
+            for (let i = 0; i < validResults.length; i++) {
+                const result = validResults[i];
+                
+                try {
+                    const link = document.createElement('a');
+                    link.download = result.outputFilename;
+                    link.href = result.dataURL;
+                    link.style.display = 'none';
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    log(`📥 下载: ${result.outputFilename}`, 'info');
+                    
+                    // 延迟避免浏览器限制
+                    if (i < validResults.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                    
+                } catch (error) {
+                    log(`❌ 下载失败: ${result.outputFilename} - ${error.message}`, 'error');
+                }
+            }
+            
+            log(`✅ 批量下载完成! 共 ${validResults.length} 个文件`, 'success');
+            log('🗂️ 请将下载的文件整理到 test_results/cropped_results_v1.0_canvas/ 文件夹', 'info');
+        }
+
+        // 页面加载完成
+        window.onload = function() {
+            log('🎨 Canvas批量裁剪处理器已加载', 'info');
+            log('📁 检测到20张真实图片配置', 'info');
+            log('🎯 已分配8种不同的使用场景', 'info');
+            log('⚡ 准备开始Canvas裁剪处理...', 'info');
+        };
+    </script>
+</body>
+</html>

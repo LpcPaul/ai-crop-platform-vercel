@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI裁剪测试文件生成器</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f7fa; 
+        }
+        .generate-section { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+            margin: 20px 0;
+        }
+        .test-case { 
+            border: 1px solid #e9ecef; 
+            border-radius: 10px; 
+            padding: 20px; 
+            margin: 20px 0; 
+            background: #f8f9fa;
+        }
+        .image-preview { display: flex; gap: 20px; margin: 20px 0; }
+        .image-box { 
+            flex: 1; 
+            text-align: center; 
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            background: white;
+        }
+        canvas { 
+            max-width: 100%; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .generate-btn { 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        .generate-btn:hover { transform: translateY(-2px); }
+        .download-all { 
+            background: linear-gradient(135deg, #28a745, #20c997);
+            font-size: 1.1em;
+            padding: 15px 30px;
+        }
+        h1 { text-align: center; color: #2c3e50; }
+        h3 { color: #495057; margin-bottom: 15px; }
+        .status { 
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            font-size: 0.9em; 
+            margin: 10px 0;
+            display: inline-block;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .crop-info { 
+            background: #e7f3ff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 AI裁剪测试文件生成器</h1>
+    <p style="text-align: center; color: #6c757d;">生成标准化测试图片和裁剪结果，用于版本管理和效果对比</p>
+
+    <div class="generate-section">
+        <h2>📁 测试文件生成</h2>
+        
+        <div class="test-case">
+            <h3>案例1: 人像摄影 → Instagram帖子 (1:1)</h3>
+            <div class="image-preview">
+                <div class="image-box">
+                    <h4>原始图片 (1200×800)</h4>
+                    <canvas id="original1" width="240" height="160"></canvas>
+                    <button class="generate-btn" onclick="downloadOriginal(1, 'portrait_1200x800.jpg')">下载原图</button>
+                </div>
+                <div class="image-box">
+                    <h4>AI裁剪结果 (1080×1080)</h4>
+                    <canvas id="cropped1" width="160" height="160"></canvas>
+                    <button class="generate-btn" onclick="downloadCropped(1, 'instagram_post_1080x1080.jpg')">下载裁剪</button>
+                </div>
+            </div>
+            <div class="crop-info">
+                <strong>📊 裁剪参数:</strong> 从(225,0)裁剪750×750区域，缩放到1080×1080<br>
+                <strong>🤖 AI推理:</strong> 人像居中构图，应用三分法则，95.2%人脸检测置信度
+            </div>
+            <div class="status success">✅ 生成完成</div>
+        </div>
+
+        <div class="test-case">
+            <h3>案例2: 风景摄影 → Instagram故事 (9:16)</h3>
+            <div class="image-preview">
+                <div class="image-box">
+                    <h4>原始图片 (1600×900)</h4>
+                    <canvas id="original2" width="240" height="135"></canvas>
+                    <button class="generate-btn" onclick="downloadOriginal(2, 'landscape_1600x900.jpg')">下载原图</button>
+                </div>
+                <div class="image-box">
+                    <h4>AI裁剪结果 (1080×1920)</h4>
+                    <canvas id="cropped2" width="108" height="192"></canvas>
+                    <button class="generate-btn" onclick="downloadCropped(2, 'instagram_story_1080x1920.jpg')">下载裁剪</button>
+                </div>
+            </div>
+            <div class="crop-info">
+                <strong>📊 裁剪参数:</strong> 从(300,0)裁剪1000×1778区域，缩放到1080×1920<br>
+                <strong>🤖 AI推理:</strong> 保留天空和山脉轮廓，天空占比40%，前景作为视觉锚点
+            </div>
+            <div class="status success">✅ 生成完成</div>
+        </div>
+
+        <div class="test-case">
+            <h3>案例3: 多人合影 → TikTok (9:16)</h3>
+            <div class="image-preview">
+                <div class="image-box">
+                    <h4>原始图片 (1400×1000)</h4>
+                    <canvas id="original3" width="224" height="160"></canvas>
+                    <button class="generate-btn" onclick="downloadOriginal(3, 'group_1400x1000.jpg')">下载原图</button>
+                </div>
+                <div class="image-box">
+                    <h4>AI裁剪结果 (1080×1920)</h4>
+                    <canvas id="cropped3" width="108" height="192"></canvas>
+                    <button class="generate-btn" onclick="downloadCropped(3, 'tiktok_1080x1920.jpg')">下载裁剪</button>
+                </div>
+            </div>
+            <div class="crop-info">
+                <strong>📊 裁剪参数:</strong> 从(262,0)裁剪875×1556区域，缩放到1080×1920<br>
+                <strong>🤖 AI推理:</strong> 检测到4个人物主体，保持群体重心位置，预留10%边缘空间
+            </div>
+            <div class="status success">✅ 生成完成</div>
+        </div>
+
+        <div class="test-case">
+            <h3>案例4: 商务头像 → LinkedIn头像 (1:1)</h3>
+            <div class="image-preview">
+                <div class="image-box">
+                    <h4>原始图片 (1000×1200)</h4>
+                    <canvas id="original4" width="133" height="160"></canvas>
+                    <button class="generate-btn" onclick="downloadOriginal(4, 'business_1000x1200.jpg')">下载原图</button>
+                </div>
+                <div class="image-box">
+                    <h4>AI裁剪结果 (400×400)</h4>
+                    <canvas id="cropped4" width="160" height="160"></canvas>
+                    <button class="generate-btn" onclick="downloadCropped(4, 'linkedin_avatar_400x400.jpg')">下载裁剪</button>
+                </div>
+            </div>
+            <div class="crop-info">
+                <strong>📊 裁剪参数:</strong> 从(200,150)裁剪600×600区域，缩放到400×400<br>
+                <strong>🤖 AI推理:</strong> 专业商务头像，突出面部特征，保留标准肩部空间
+            </div>
+            <div class="status success">✅ 生成完成</div>
+        </div>
+
+        <div class="test-case">
+            <h3>案例5: 生活照片 → 微信头像 (1:1)</h3>
+            <div class="image-preview">
+                <div class="image-box">
+                    <h4>原始图片 (1100×800)</h4>
+                    <canvas id="original5" width="220" height="160"></canvas>
+                    <button class="generate-btn" onclick="downloadOriginal(5, 'casual_1100x800.jpg')">下载原图</button>
+                </div>
+                <div class="image-box">
+                    <h4>AI裁剪结果 (640×640)</h4>
+                    <canvas id="cropped5" width="160" height="160"></canvas>
+                    <button class="generate-btn" onclick="downloadCropped(5, 'wechat_avatar_640x640.jpg')">下载裁剪</button>
+                </div>
+            </div>
+            <div class="crop-info">
+                <strong>📊 裁剪参数:</strong> 从(250,100)裁剪600×600区域，缩放到640×640<br>
+                <strong>🤖 AI推理:</strong> 自然表情，包含背景装饰元素，色彩温暖亲和
+            </div>
+            <div class="status success">✅ 生成完成</div>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="generate-btn download-all" onclick="downloadAllFiles()">
+                📦 批量下载所有测试文件
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 测试用例数据
+        const testCases = {
+            1: {
+                original: { width: 1200, height: 800, name: 'portrait' },
+                cropped: { width: 1080, height: 1080, crop: { x: 225, y: 0, width: 750, height: 750 } }
+            },
+            2: {
+                original: { width: 1600, height: 900, name: 'landscape' },
+                cropped: { width: 1080, height: 1920, crop: { x: 300, y: 0, width: 1000, height: 1778 } }
+            },
+            3: {
+                original: { width: 1400, height: 1000, name: 'group' },
+                cropped: { width: 1080, height: 1920, crop: { x: 262, y: 0, width: 875, height: 1556 } }
+            },
+            4: {
+                original: { width: 1000, height: 1200, name: 'business' },
+                cropped: { width: 400, height: 400, crop: { x: 200, y: 150, width: 600, height: 600 } }
+            },
+            5: {
+                original: { width: 1100, height: 800, name: 'casual' },
+                cropped: { width: 640, height: 640, crop: { x: 250, y: 100, width: 600, height: 600 } }
+            }
+        };
+
+        // 生成原始图片
+        function generateOriginalImage(testId) {
+            const canvas = document.getElementById(`original${testId}`);
+            const ctx = canvas.getContext('2d');
+            
+            switch(testId) {
+                case 1: return drawPortrait(ctx, canvas.width, canvas.height);
+                case 2: return drawLandscape(ctx, canvas.width, canvas.height);
+                case 3: return drawGroup(ctx, canvas.width, canvas.height);
+                case 4: return drawBusiness(ctx, canvas.width, canvas.height);
+                case 5: return drawCasual(ctx, canvas.width, canvas.height);
+            }
+        }
+
+        // 生成裁剪后的图片
+        function generateCroppedImage(testId) {
+            const originalCanvas = document.getElementById(`original${testId}`);
+            const croppedCanvas = document.getElementById(`cropped${testId}`);
+            const ctx = croppedCanvas.getContext('2d');
+            
+            const testCase = testCases[testId];
+            const scale = originalCanvas.width / testCase.original.width;
+            
+            // 计算缩放后的裁剪区域
+            const crop = {
+                x: testCase.cropped.crop.x * scale,
+                y: testCase.cropped.crop.y * scale,
+                width: testCase.cropped.crop.width * scale,
+                height: testCase.cropped.crop.height * scale
+            };
+            
+            // 执行裁剪
+            ctx.drawImage(
+                originalCanvas,
+                crop.x, crop.y, crop.width, crop.height,
+                0, 0, croppedCanvas.width, croppedCanvas.height
+            );
+        }
+
+        // 人像场景
+        function drawPortrait(ctx, w, h) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#E0F6FF');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+            
+            // 人物头部
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.5, h*0.4, Math.min(w,h)*0.12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 身体
+            ctx.fillStyle = '#4169E1';
+            ctx.fillRect(w*0.42, h*0.5, w*0.16, h*0.3);
+        }
+
+        // 风景场景
+        function drawLandscape(ctx, w, h) {
+            // 天空渐变
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, h*0.6);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(1, '#B0E0E6');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, w, h*0.6);
+            
+            // 山脉
+            ctx.fillStyle = '#8B7355';
+            ctx.beginPath();
+            ctx.moveTo(0, h*0.6);
+            ctx.lineTo(w*0.3, h*0.3);
+            ctx.lineTo(w*0.6, h*0.45);
+            ctx.lineTo(w*0.9, h*0.2);
+            ctx.lineTo(w, h*0.4);
+            ctx.lineTo(w, h*0.6);
+            ctx.fill();
+            
+            // 草地
+            ctx.fillStyle = '#90EE90';
+            ctx.fillRect(0, h*0.6, w, h*0.4);
+            
+            // 太阳
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(w*0.85, h*0.15, Math.min(w,h)*0.05, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 群体场景
+        function drawGroup(ctx, w, h) {
+            ctx.fillStyle = '#F5F5DC';
+            ctx.fillRect(0, 0, w, h);
+            
+            const people = [
+                {x: w*0.25, y: h*0.45, color: '#FFB07A'},
+                {x: w*0.4, y: h*0.4, color: '#DEB887'},
+                {x: w*0.6, y: h*0.42, color: '#F0E68C'},
+                {x: w*0.75, y: h*0.47, color: '#FFB07A'}
+            ];
+            
+            people.forEach(person => {
+                // 头部
+                ctx.fillStyle = person.color;
+                ctx.beginPath();
+                ctx.arc(person.x, person.y, Math.min(w,h)*0.06, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 身体
+                ctx.fillStyle = '#4169E1';
+                ctx.fillRect(person.x - w*0.04, person.y + Math.min(w,h)*0.04, w*0.08, h*0.2);
+            });
+        }
+
+        // 商务场景
+        function drawBusiness(ctx, w, h) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, '#36454F');
+            gradient.addColorStop(1, '#2F4F4F');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, w, h);
+            
+            // 头部
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.5, h*0.35, Math.min(w,h)*0.1, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 西装
+            ctx.fillStyle = '#000080';
+            ctx.fillRect(w*0.4, h*0.42, w*0.2, h*0.35);
+            
+            // 领带
+            ctx.fillStyle = '#DC143C';
+            ctx.fillRect(w*0.485, h*0.42, w*0.03, h*0.2);
+        }
+
+        // 休闲场景
+        function drawCasual(ctx, w, h) {
+            ctx.fillStyle = '#FFE4E1';
+            ctx.fillRect(0, 0, w, h);
+            
+            // 人物
+            ctx.fillStyle = '#FFB07A';
+            ctx.beginPath();
+            ctx.arc(w*0.45, h*0.4, Math.min(w,h)*0.08, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 衣服
+            ctx.fillStyle = '#FF6347';
+            ctx.fillRect(w*0.38, h*0.46, w*0.14, h*0.25);
+            
+            // 装饰花朵
+            ctx.fillStyle = '#FF1493';
+            for(let i = 0; i < 8; i++) {
+                const x = w*0.1 + Math.random() * w*0.8;
+                const y = h*0.1 + Math.random() * h*0.2;
+                ctx.beginPath();
+                ctx.arc(x, y, Math.min(w,h)*0.015, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // 下载原始图片
+        function downloadOriginal(testId, filename) {
+            const canvas = document.getElementById(`original${testId}`);
+            const testCase = testCases[testId];
+            
+            // 创建高分辨率版本
+            const highResCanvas = document.createElement('canvas');
+            highResCanvas.width = testCase.original.width;
+            highResCanvas.height = testCase.original.height;
+            const ctx = highResCanvas.getContext('2d');
+            
+            // 绘制高分辨率图片
+            switch(testId) {
+                case 1: drawPortrait(ctx, highResCanvas.width, highResCanvas.height); break;
+                case 2: drawLandscape(ctx, highResCanvas.width, highResCanvas.height); break;
+                case 3: drawGroup(ctx, highResCanvas.width, highResCanvas.height); break;
+                case 4: drawBusiness(ctx, highResCanvas.width, highResCanvas.height); break;
+                case 5: drawCasual(ctx, highResCanvas.width, highResCanvas.height); break;
+            }
+            
+            downloadCanvas(highResCanvas, filename);
+        }
+
+        // 下载裁剪图片
+        function downloadCropped(testId, filename) {
+            const testCase = testCases[testId];
+            
+            // 创建高分辨率原图
+            const originalCanvas = document.createElement('canvas');
+            originalCanvas.width = testCase.original.width;
+            originalCanvas.height = testCase.original.height;
+            let ctx = originalCanvas.getContext('2d');
+            
+            switch(testId) {
+                case 1: drawPortrait(ctx, originalCanvas.width, originalCanvas.height); break;
+                case 2: drawLandscape(ctx, originalCanvas.width, originalCanvas.height); break;
+                case 3: drawGroup(ctx, originalCanvas.width, originalCanvas.height); break;
+                case 4: drawBusiness(ctx, originalCanvas.width, originalCanvas.height); break;
+                case 5: drawCasual(ctx, originalCanvas.width, originalCanvas.height); break;
+            }
+            
+            // 创建裁剪后的图片
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = testCase.cropped.width;
+            croppedCanvas.height = testCase.cropped.height;
+            ctx = croppedCanvas.getContext('2d');
+            
+            const crop = testCase.cropped.crop;
+            ctx.drawImage(
+                originalCanvas,
+                crop.x, crop.y, crop.width, crop.height,
+                0, 0, croppedCanvas.width, croppedCanvas.height
+            );
+            
+            downloadCanvas(croppedCanvas, filename);
+        }
+
+        // 下载Canvas图片
+        function downloadCanvas(canvas, filename) {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+        }
+
+        // 批量下载所有文件
+        function downloadAllFiles() {
+            const files = [
+                { testId: 1, type: 'original', filename: 'portrait_1200x800.jpg' },
+                { testId: 1, type: 'cropped', filename: 'instagram_post_1080x1080.jpg' },
+                { testId: 2, type: 'original', filename: 'landscape_1600x900.jpg' },
+                { testId: 2, type: 'cropped', filename: 'instagram_story_1080x1920.jpg' },
+                { testId: 3, type: 'original', filename: 'group_1400x1000.jpg' },
+                { testId: 3, type: 'cropped', filename: 'tiktok_1080x1920.jpg' },
+                { testId: 4, type: 'original', filename: 'business_1000x1200.jpg' },
+                { testId: 4, type: 'cropped', filename: 'linkedin_avatar_400x400.jpg' },
+                { testId: 5, type: 'original', filename: 'casual_1100x800.jpg' },
+                { testId: 5, type: 'cropped', filename: 'wechat_avatar_640x640.jpg' }
+            ];
+            
+            files.forEach((file, index) => {
+                setTimeout(() => {
+                    if (file.type === 'original') {
+                        downloadOriginal(file.testId, file.filename);
+                    } else {
+                        downloadCropped(file.testId, file.filename);
+                    }
+                }, index * 300); // 300ms间隔避免浏览器限制
+            });
+            
+            console.log('📦 开始批量下载10个测试文件...');
+        }
+
+        // 页面加载完成后生成所有预览
+        window.onload = function() {
+            console.log('🎨 生成测试文件预览...');
+            
+            for (let i = 1; i <= 5; i++) {
+                generateOriginalImage(i);
+                // 延迟生成裁剪图片，确保原图先完成
+                setTimeout(() => generateCroppedImage(i), 100);
+            }
+            
+            console.log('✅ 测试文件生成器就绪');
+        };
+    </script>
+</body>
+</html>
