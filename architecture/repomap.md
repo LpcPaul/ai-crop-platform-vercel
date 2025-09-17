@@ -31,6 +31,7 @@
 ./LICENSE
 ./vercel.json
 ./setupyourpay.png
+./CHANGELOG.md
 ./test_image.txt
 ./css
 ./css/app-style.css
