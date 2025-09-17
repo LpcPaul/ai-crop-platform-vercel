@@ -212,10 +212,10 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
   // 最多尝试2次请求
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      console.log(`[GPT-5] 第${attempt}次请求 - 图片尺寸: ${originalWidth}×${originalHeight}`);
+      console.log(`[GPT-4.1] 第${attempt}次请求 - 图片尺寸: ${originalWidth}×${originalHeight}`);
       
       const response = await axios.post('https://api.apiyi.com/v1/chat/completions', {
-        model: 'gpt-5-mini-2025-08-07',
+        model: 'gpt-4.1-2025-04-14',
         messages: [
           {
             role: 'system',
@@ -233,8 +233,8 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
             ]
           }
         ],
-        max_tokens: 800,
-        temperature: 0.3
+        max_tokens: 1500,
+        temperature: 0.1
       }, {
         headers: {
           'Authorization': `Bearer sk-cSkEKdy2yfQ5Lvlq10Db1c83823f4607Bb9a25751bE9Ac37`,
@@ -242,23 +242,35 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
         }
       });
 
+      console.log(`[GPT-4.1] HTTP状态码:`, response.status);
+      console.log(`[GPT-4.1] 完整响应:`, JSON.stringify(response.data, null, 2));
+
+      // 检查响应结构
+      if (!response.data || !response.data.choices || !response.data.choices[0]) {
+        throw new Error(`GPT API响应结构异常: ${JSON.stringify(response.data)}`);
+      }
+
       const content = response.data.choices[0].message.content;
-      console.log(`[GPT-5] 原始响应长度: ${content.length}字符`);
-      console.log(`[GPT-5] 原始响应内容:`, content);
+      console.log(`[GPT-4.1] 原始响应长度: ${content ? content.length : 0}字符`);
+      console.log(`[GPT-4.1] 原始响应内容:`, content);
+
+      if (!content || content.length === 0) {
+        throw new Error('GPT API返回空内容');
+      }
       
       // 尝试提取JSON
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error('无法解析GPT-5响应中的JSON');
+        throw new Error('无法解析GPT-4.1响应中的JSON');
       }
       
-      console.log(`[GPT-5] 提取的JSON:`, jsonMatch[0]);
+      console.log(`[GPT-4.1] 提取的JSON:`, jsonMatch[0]);
       const parsedResult = JSON.parse(jsonMatch[0]);
-      console.log(`[GPT-5] 解析后的对象:`, JSON.stringify(parsedResult, null, 2));
+      console.log(`[GPT-4.1] 解析后的对象:`, JSON.stringify(parsedResult, null, 2));
       
       // 验证必要字段是否存在
       if (!parsedResult.analysis || !parsedResult.crop_params) {
-        throw new Error('GPT-5响应缺少必要字段');
+        throw new Error('GPT-4.1响应缺少必要字段');
       }
       
       // 验证并修正crop_params

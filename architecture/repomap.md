@@ -31,6 +31,7 @@
 ./.env.local
 ./LICENSE
 ./vercel.json
+./test-image.html
 ./setupyourpay.png
 ./CHANGELOG.md
 ./test_image.txt
@@ -2388,10 +2389,13 @@
 ./crop-service/output/aesthetic_c4d7e92b-2931-4c3b-9df2-cc1a9d32cde5.png
 ./crop-service/output/aesthetic_2320dc55-07de-466c-ba7f-bed16dffccd7.png
 ./crop-service/output/aesthetic_26dd4cfc-ce9d-4a85-a8e7-0a09f11beb08.png
+./crop-service/output/aesthetic_97be7e1d-b66a-40e1-947f-9f84a4f60a5b.png
 ./crop-service/output/aesthetic_bdfd1890-f37d-4290-8477-092a296e7124.png
 ./crop-service/output/batch_aesthetic_5b130549-c0db-46b9-ad7c-e7c400257bc0_1.jpeg
 ./crop-service/output/aesthetic_c33f135e-ca4e-4019-bf91-515e5b7e3266.jpeg
+./crop-service/output/aesthetic_e62c819b-a439-498a-a93a-ad0e9004d710.png
 ./crop-service/output/batch_aesthetic_cb3aedc6-c443-4c50-8b39-93d08f1219a2_1.jpeg
+./crop-service/output/aesthetic_5a2ae617-c10c-40ad-b884-a73713b4a61c.png
 ./crop-service/output/aesthetic_6f745fb9-74b8-4880-b2c0-511a610e1e23.png
 ./crop-service/output/batch_aesthetic_fc913983-2ccf-437d-994c-f77ff051bca8_1.jpeg
 ./crop-service/output/aesthetic_49485462-a7f8-48bc-b8be-f007bcedf355.png
