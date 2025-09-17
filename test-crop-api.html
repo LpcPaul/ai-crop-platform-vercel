@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试AI裁剪API</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; background: #f9f9f9; }
+        .error { background: #fee; border-color: #fcc; }
+        .success { background: #efe; border-color: #cfc; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input[type="file"] { margin: 10px 0; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI裁剪服务测试</h1>
+
+        <h2>1. 测试后端服务连接</h2>
+        <button onclick="testBackendHealth()">测试后端健康状态</button>
+
+        <h2>2. 测试图片上传和裁剪</h2>
+        <input type="file" id="imageInput" accept="image/*">
+        <button onclick="testImageCrop()">测试图片裁剪</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function testBackendHealth() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>正在测试后端连接...</p>';
+
+            try {
+                const response = await fetch('http://localhost:3002/api/health');
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <h3>✅ 后端服务连接成功</h3>
+                        <p><strong>状态:</strong> ${response.status}</p>
+                        <p><strong>服务:</strong> ${data.service}</p>
+                        <p><strong>运行时间:</strong> ${data.uptime} 秒</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ 后端服务连接失败</h3>
+                        <p><strong>错误:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testImageCrop() {
+            const resultDiv = document.getElementById('result');
+            const fileInput = document.getElementById('imageInput');
+
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ 请先选择图片</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+
+            resultDiv.innerHTML = '<p>正在处理图片...</p>';
+            const startTime = Date.now();
+
+            try {
+                const response = await fetch('http://localhost:3002/api/crop/aesthetic', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <h3>✅ 图片裁剪成功</h3>
+                        <p><strong>处理时间:</strong> ${duration}ms (${(duration/1000).toFixed(2)}秒)</p>
+                        <p><strong>方案标题:</strong> ${data.analysis?.方案标题 || 'N/A'}</p>
+                        <p><strong>效果:</strong> ${data.analysis?.效果 || 'N/A'}</p>
+                        <p><strong>裁剪参数:</strong></p>
+                        <ul>
+                            <li>x: ${data.crop_params?.x || 0}</li>
+                            <li>y: ${data.crop_params?.y || 0}</li>
+                            <li>width: ${data.crop_params?.width || 0}</li>
+                            <li>height: ${data.crop_params?.height || 0}</li>
+                        </ul>
+                        <details>
+                            <summary>完整响应</summary>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </details>
+                    </div>
+                `;
+            } catch (error) {
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ 图片裁剪失败</h3>
+                        <p><strong>处理时间:</strong> ${duration}ms</p>
+                        <p><strong>错误:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 import { Button } from "@saasfly/ui/button";
 import {
@@ -16,9 +16,14 @@ import { i18n, localeMap } from "~/config/i18n-config";
 
 export function LocaleChange({ url }: { url: string }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   function onClick(locale: string) {
-    router.push(`/${locale}/` + url);
+    // 保持当前路径，只替换语言部分
+    const segments = pathname.split('/');
+    segments[1] = locale;
+    const newPath = segments.join('/');
+    router.replace(newPath);
   }
 
   return (

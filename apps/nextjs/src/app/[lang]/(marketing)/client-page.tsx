@@ -42,9 +42,72 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
   const [showOriginalLarge, setShowOriginalLarge] = useState<boolean>(false); // false=裁剪图大图, true=原图大图
   const touchStartX = useRef<number | null>(null);
 
+  // 图片尺寸状态
+  const [originalImageDimensions, setOriginalImageDimensions] = useState<{width: number, height: number} | null>(null);
+  const [croppedImageDimensions, setCroppedImageDimensions] = useState<{width: number, height: number} | null>(null);
+
   // 切换视图大小
   const toggleViewSize = () => {
     setShowOriginalLarge(prev => !prev);
+  };
+
+  // 处理原图加载
+  const handleOriginalImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    setOriginalImageDimensions({
+      width: img.naturalWidth,
+      height: img.naturalHeight
+    });
+  };
+
+  // 处理裁剪图加载
+  const handleCroppedImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = event.currentTarget;
+    setCroppedImageDimensions({
+      width: img.naturalWidth,
+      height: img.naturalHeight
+    });
+  };
+
+  // 获取动态容器样式
+  const getContainerStyle = (dimensions: {width: number, height: number} | null, isLarge: boolean) => {
+    if (!dimensions) {
+      return {
+        className: "aspect-[3/4]",
+        style: {}
+      };
+    }
+
+    const aspectRatio = dimensions.width / dimensions.height;
+
+    if (isLarge) {
+      // 大图模式：确保图片完整展示
+      if (aspectRatio > 2) {
+        // 超宽图片
+        return {
+          className: "",
+          style: { aspectRatio: aspectRatio.toString(), maxHeight: '400px' }
+        };
+      } else if (aspectRatio < 0.5) {
+        // 超高图片
+        return {
+          className: "",
+          style: { aspectRatio: aspectRatio.toString(), maxHeight: '800px' }
+        };
+      } else {
+        // 正常比例图片
+        return {
+          className: "",
+          style: { aspectRatio: aspectRatio.toString(), maxHeight: '600px' }
+        };
+      }
+    } else {
+      // 小图模式：固定尺寸
+      return {
+        className: "aspect-[3/4]",
+        style: {}
+      };
+    }
   };
 
   // 键盘事件处理
@@ -89,6 +152,9 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
     const files = Array.from(e.dataTransfer.files);
     if (files.length > 0 && files[0].type.startsWith('image/')) {
       setSelectedFile(files[0]);
+      setOriginalImageDimensions(null);
+      setCroppedImageDimensions(null);
+      setCropResult(null);
     }
   };
 
@@ -96,6 +162,9 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
     const files = e.target.files;
     if (files && files.length > 0) {
       setSelectedFile(files[0]);
+      setOriginalImageDimensions(null);
+      setCroppedImageDimensions(null);
+      setCropResult(null);
     }
   };
 
@@ -437,11 +506,9 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                         <div
                           className={
                             "group relative overflow-hidden rounded-lg bg-[#F5F7FF] dark:bg-[#141926] " +
-                            (showOriginalLarge ? "aspect-auto" : "aspect-[3/4]")
+                            getContainerStyle(originalImageDimensions, showOriginalLarge).className
                           }
-                          style={{
-                            maxHeight: showOriginalLarge ? '600px' : 'auto'
-                          }}
+                          style={getContainerStyle(originalImageDimensions, showOriginalLarge).style}
                         >
                           <img
                             src={URL.createObjectURL(selectedFile)}
@@ -454,12 +521,10 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                                 : "h-full w-full object-contain scale-[1.0] hover:scale-105")
                             }
                             onClick={toggleViewSize}
+                            onLoad={handleOriginalImageLoad}
                           />
 
-                          {/* 角标 */}
-                          <div className="absolute left-3 top-3 rounded-md bg-black/60 px-2 py-1 text-xs text-white">
-                            {showOriginalLarge ? "大图视图" : "标准视图"}
-                          </div>
+                          {/* 角标 - 已移除，避免遮挡画面 */}
                         </div>
                         <div className="mt-2 text-center text-sm font-medium text-[#374151] dark:text-gray-200">原图</div>
                       </div>
@@ -476,11 +541,9 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                         <div
                           className={
                             "group relative overflow-hidden rounded-lg bg-[#FFF6EB] dark:bg-[#1C1712] " +
-                            (!showOriginalLarge ? "aspect-auto" : "aspect-[3/4]")
+                            getContainerStyle(croppedImageDimensions, !showOriginalLarge).className
                           }
-                          style={{
-                            maxHeight: !showOriginalLarge ? '600px' : 'auto'
-                          }}
+                          style={getContainerStyle(croppedImageDimensions, !showOriginalLarge).style}
                         >
                           <img
                             src={`http://localhost:3002${cropResult.output.download_url}`}
@@ -493,12 +556,10 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                                 : "h-full w-full object-contain scale-[1.0]")
                             }
                             onClick={toggleViewSize}
+                            onLoad={handleCroppedImageLoad}
                           />
 
-                          {/* 角标 */}
-                          <div className="absolute left-3 top-3 rounded-md bg-black/60 px-2 py-1 text-xs text-white">
-                            {showOriginalLarge ? "标准视图" : "大图视图"}
-                          </div>
+                          {/* 角标 - 已移除，避免遮挡画面 */}
                         </div>
                         <div className="mt-2 text-center text-sm font-medium text-[#374151] dark:text-gray-200">裁剪结果</div>
                       </div>
