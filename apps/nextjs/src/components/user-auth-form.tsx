@@ -43,7 +43,7 @@ export function UserAuthForm({
     resolver: zodResolver(userAuthSchema),
   });
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false);
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
   const searchParams = useSearchParams();
 
   async function onSubmit(data: FormData) {
@@ -88,7 +88,7 @@ export function UserAuthForm({
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading || isGitHubLoading || disabled}
+              disabled={isLoading || isGoogleLoading || disabled}
               {...register("email")}
             />
             {errors?.email && (
@@ -121,19 +121,19 @@ export function UserAuthForm({
         type="button"
         className={cn(buttonVariants({ variant: "outline" }))}
         onClick={() => {
-          setIsGitHubLoading(true);
-          signIn("github").catch((error) => {
-            console.error("GitHub signIn error:", error);
+          setIsGoogleLoading(true);
+          signIn("google").catch((error) => {
+            console.error("Google signIn error:", error);
           });
         }}
-        disabled={isLoading || isGitHubLoading}
+        disabled={isLoading || isGoogleLoading}
       >
-        {isGitHubLoading ? (
+        {isGoogleLoading ? (
           <Icons.Spinner className="mr-2 h-4 w-4 animate-spin" />
         ) : (
-          <Icons.GitHub className="mr-2 h-4 w-4" />
+          <Icons.Google className="mr-2 h-4 w-4" />
         )}{" "}
-        Github
+        Google
       </button>
     </div>
   );

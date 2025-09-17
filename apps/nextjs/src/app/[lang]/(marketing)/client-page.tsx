@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@saasfly/ui";
 import { Button } from "@saasfly/ui/button";
 import { Locale, localeMap } from "~/config/i18n-config";
@@ -11,12 +11,67 @@ interface ClientIndexPageProps {
   lang: Locale;
 }
 
+// Dot 组件用于底部切换指示器
+interface DotProps {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}
+
+function Dot({ active, onClick, label }: DotProps) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={active}
+      className={`h-2.5 w-2.5 rounded-full border transition-all duration-200 outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF6B4A]/20 ${
+        active
+          ? "bg-[#FF6B4A] border-[#FF6B4A]"
+          : "bg-white border-[#E7EAF0] hover:bg-[#FAFAFB]"
+      }`}
+    />
+  );
+}
+
 export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cropResult, setCropResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showOriginalLarge, setShowOriginalLarge] = useState<boolean>(false); // false=裁剪图大图, true=原图大图
+  const touchStartX = useRef<number | null>(null);
+
+  // 切换视图大小
+  const toggleViewSize = () => {
+    setShowOriginalLarge(prev => !prev);
+  };
+
+  // 键盘事件处理
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (['ArrowLeft', 'ArrowRight', ' ', 'Enter'].includes(e.key)) {
+      e.preventDefault();
+      toggleViewSize();
+    }
+  };
+
+  // 触摸开始
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  // 触摸结束 - 检测左右轻扫
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    const swipeThreshold = 36; // 轻扫阈值
+
+    if (Math.abs(dx) > swipeThreshold) {
+      toggleViewSize();
+    }
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -60,7 +115,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-      const response = await fetch('http://localhost:3002/api/crop/analyze', {
+      const response = await fetch('http://localhost:3002/api/analyze-debug', {
         method: 'POST',
         body: formData,
         signal: controller.signal,
@@ -105,7 +160,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
-      const response = await fetch('http://localhost:3002/api/crop', {
+      const response = await fetch('http://localhost:3002/api/crop/aesthetic', {
         method: 'POST',
         body: formData,
         signal: controller.signal,
@@ -123,10 +178,8 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
 
       const result = await response.json();
 
-      // If we get a download URL, open it in a new tab
-      if (result.downloadUrl) {
-        window.open(`http://localhost:3002${result.downloadUrl}`, '_blank');
-      }
+      // Store the result for display
+      setCropResult(result);
 
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -140,7 +193,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 dark:from-gray-900 dark:via-orange-900/10 dark:to-red-900/10">
+    <div className="min-h-screen bg-[#FAFAFB] dark:bg-gray-900">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b dark:bg-gray-900/80 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,21 +237,19 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                 size="sm"
                 className="border-orange-500 text-orange-600 hover:bg-orange-50 hover:text-orange-700 hover:border-orange-600 dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300 font-medium"
                 onClick={() => {
-                  // TODO: Implement login modal or redirect
-                  console.log('Login clicked');
+                  window.location.href = `/${lang}/login`;
                 }}
               >
-                {dict.marketing.login}
+                {dict.marketing.login || "登录"}
               </Button>
               <Button
                 size="sm"
                 className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-md font-medium"
                 onClick={() => {
-                  // TODO: Implement signup modal or redirect
-                  console.log('Signup clicked');
+                  window.location.href = `/${lang}/register`;
                 }}
               >
-                {dict.marketing.signup}
+                {dict.marketing.signup || "注册"}
               </Button>
             </div>
           </div>
@@ -208,20 +259,21 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4 dark:text-white">
+          <h2 className="text-4xl font-bold text-[#111827] mb-4 dark:text-white">
             {dict.marketing.title}
           </h2>
-          <p className="text-xl text-gray-600 mb-8 dark:text-gray-300">
+          <p className="text-xl text-[#374151] mb-8 dark:text-gray-300">
             {dict.marketing.sub_title}
           </p>
         </div>
 
-        {/* Upload Section */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-orange-100/50 p-8 mb-8 dark:bg-gray-900/90 dark:border-orange-800/30">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-2 text-center dark:text-white">
+        {/* Upload Section - Hidden when showing results */}
+        {!cropResult && (
+          <div className="bg-white rounded-2xl shadow-[0_8px_32px_rgba(16,24,40,0.06)] border border-[#E7EAF0] p-8 mb-8 dark:bg-[#0E1116] dark:border-gray-700">
+          <h3 className="text-2xl font-semibold text-[#111827] mb-2 text-center dark:text-white">
             {dict.crop?.title || "AI智能裁剪"}
           </h3>
-          <p className="text-gray-600 mb-6 text-center dark:text-gray-300">
+          <p className="text-[#374151] mb-6 text-center dark:text-gray-300">
             {dict.crop?.subtitle || "上传图片，使用AI技术进行智能裁剪，快速获得完美构图"}
           </p>
 
@@ -231,7 +283,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                 "border-2 border-dashed rounded-xl p-12 text-center transition-colors",
                 isDragOver
                   ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                  : "border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/50"
+                  : "border-[#E7EAF0] bg-[#FAFAFB] dark:border-gray-600 dark:bg-gray-800/50"
               )}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -244,18 +296,20 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                  <p className="text-lg font-medium text-[#374151] dark:text-gray-300">
                     {dict.crop?.upload_hint || "拖拽图片到这里或点击选择文件"}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-[#6B7280] dark:text-gray-400 mt-1">
                     支持 JPG, PNG, WEBP 格式
                   </p>
                 </div>
-                <label htmlFor="file-upload" className="cursor-pointer">
-                  <Button size="lg">
-                    {dict.crop?.select_image || "选择图片"}
-                  </Button>
-                </label>
+                <Button
+                  size="lg"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {dict.crop?.select_image || "选择图片"}
+                </Button>
                 <input
                   id="file-upload"
                   type="file"
@@ -286,11 +340,8 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                     />
                   </div>
                   <div className="flex justify-center space-x-4 flex-wrap">
-                    <Button onClick={handleCropAnalysis} size="lg" className="bg-green-600 hover:bg-green-700">
-                      🧠 AI分析裁剪建议
-                    </Button>
-                    <Button onClick={handleCropProcess} size="lg" className="bg-blue-600 hover:bg-blue-700">
-                      ✂️ 直接裁剪处理
+                    <Button onClick={handleCropProcess} size="lg" className="bg-[#FF6B4A] hover:bg-[#E85E43] text-white shadow-md font-medium">
+                      ✨ AI自动裁剪
                     </Button>
                     <Button
                       onClick={() => {
@@ -300,6 +351,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                       }}
                       variant="outline"
                       size="lg"
+                      className="border-[#E7EAF0] text-[#374151] hover:bg-[#FAFAFB]"
                     >
                       {dict.crop?.reset || "重新选择"}
                     </Button>
@@ -309,6 +361,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
             </div>
           )}
         </div>
+        )}
 
         {/* Error Display */}
         {error && (
@@ -328,67 +381,210 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
 
         {/* Crop Result Display */}
         {cropResult && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-orange-100/50 p-8 dark:bg-gray-900/90 dark:border-orange-800/30">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4 text-center dark:text-white">🎯 AI分析结果</h3>
+          <div className="bg-white rounded-2xl shadow-[0_8px_32px_rgba(16,24,40,0.06)] border border-[#E7EAF0] p-8 dark:bg-[#0E1116] dark:border-gray-700">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-semibold text-[#111827] dark:text-white">🎯 AI分析结果</h3>
+              <p className="text-sm text-[#6B7280] mt-2 dark:text-gray-400">
+                💡 点击图片、轻扫或按键切换查看模式
+              </p>
+            </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            {/* 构图对比：固定左右 + 大小切换 */}
+            <div
+              className="mb-8 w-full select-none"
+              role="region"
+              aria-label="构图查看器"
+              onKeyDown={handleKeyDown}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              tabIndex={0}
+            >
+              {cropResult.output?.download_url && selectedFile ? (
+                <div className="space-y-6">
+                  <div className="flex gap-4 items-start">
+                    {/* 左：原图（大小可切换） */}
+                    <div
+                      className={
+                        "transition-all duration-300 ease-out " +
+                        (showOriginalLarge ? "flex-1" : "flex-shrink-0 w-[200px]")
+                      }
+                    >
+                      <div className="relative bg-[#F5F7FF] dark:bg-[#141926] rounded-xl border border-[#E7EAF0] shadow-sm p-4">
+                        <div className="group relative overflow-hidden rounded-lg bg-[#F5F7FF] dark:bg-[#141926] aspect-[3/4]">
+                          <img
+                            src={URL.createObjectURL(selectedFile)}
+                            alt="原始图片"
+                            draggable={false}
+                            className={
+                              "h-full w-full cursor-pointer transition-all duration-500 ease-out will-change-transform " +
+                              (showOriginalLarge
+                                ? "object-cover scale-[1.02]"
+                                : "object-contain scale-[1.0] hover:scale-105")
+                            }
+                            onClick={toggleViewSize}
+                          />
+
+                          {/* 角标 */}
+                          <div className="absolute left-3 top-3 rounded-md bg-black/60 px-2 py-1 text-xs text-white">
+                            {showOriginalLarge ? "大图视图" : "标准视图"}
+                          </div>
+                        </div>
+                        <div className="mt-2 text-center text-sm font-medium text-[#374151] dark:text-gray-200">原图</div>
+                      </div>
+                    </div>
+
+                    {/* 右：裁剪结果（大小可切换） */}
+                    <div
+                      className={
+                        "transition-all duration-300 ease-out " +
+                        (showOriginalLarge ? "flex-shrink-0 w-[200px]" : "flex-1")
+                      }
+                    >
+                      <div className="relative rounded-xl border border-[#E7EAF0] bg-[#FFF6EB] dark:bg-[#1C1712] shadow-sm p-4">
+                        <div className="group relative overflow-hidden rounded-lg bg-[#FFF6EB] dark:bg-[#1C1712] aspect-[3/4]">
+                          <img
+                            src={`http://localhost:3002${cropResult.output.download_url}`}
+                            alt="裁剪后图片"
+                            draggable={false}
+                            className={
+                              "h-full w-full transition-all duration-500 ease-out will-change-transform cursor-pointer " +
+                              (!showOriginalLarge
+                                ? "object-cover scale-[1.02]"
+                                : "object-contain scale-[1.0]")
+                            }
+                            onClick={toggleViewSize}
+                          />
+
+                          {/* 角标 */}
+                          <div className="absolute left-3 top-3 rounded-md bg-black/60 px-2 py-1 text-xs text-white">
+                            {showOriginalLarge ? "标准视图" : "大图视图"}
+                          </div>
+                        </div>
+                        <div className="mt-2 text-center text-sm font-medium text-[#374151] dark:text-gray-200">裁剪结果</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 独立的切换控制组件 */}
+                  <div className="flex items-center justify-center gap-4 py-4">
+                    <Dot
+                      active={showOriginalLarge}
+                      onClick={() => setShowOriginalLarge(true)}
+                      label="切换到原图大图视图"
+                    />
+                    <Dot
+                      active={!showOriginalLarge}
+                      onClick={() => setShowOriginalLarge(false)}
+                      label="切换到裁剪结果大图视图"
+                    />
+                    <span className="text-xs text-[#6B7280] dark:text-gray-400">
+                      点击图片 / 轻扫左右 / 按空格切换
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full h-[400px] flex items-center justify-center text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-[#FFF6EB] dark:bg-[#1C1712]">
+                  <div className="text-center">
+                    <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p>裁剪结果生成中...</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Analysis and Details Section */}
+            <div className="grid md:grid-cols-2 gap-6">
               {/* AI Analysis */}
               <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-3 dark:text-white">💡 AI分析建议</h4>
-                <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 mb-4">
-                  <p className="text-blue-900 dark:text-blue-200 font-medium mb-2">{cropResult.reason}</p>
-                  <p className="text-blue-700 dark:text-blue-300 text-sm">{cropResult.details}</p>
-                </div>
-
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">原始尺寸:</span>
-                    <span className="font-mono dark:text-gray-300">{cropResult.crop_params?.original_size?.[0]} × {cropResult.crop_params?.original_size?.[1]}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">裁剪区域:</span>
-                    <span className="font-mono dark:text-gray-300">
-                      {cropResult.crop_params?.crop_box?.width} × {cropResult.crop_params?.crop_box?.height}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">输出尺寸:</span>
-                    <span className="font-mono dark:text-gray-300">{cropResult.crop_params?.output_size?.[0]} × {cropResult.crop_params?.output_size?.[1]}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">裁剪比例:</span>
-                    <span className="font-medium dark:text-gray-300">{cropResult.crop_params?.crop_ratio}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">数据源:</span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      cropResult.metadata?.source === 'model' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                      cropResult.metadata?.source === 'cache' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                    }`}>
-                      {cropResult.metadata?.source === 'model' ? '🤖 AI模型' :
-                       cropResult.metadata?.source === 'cache' ? '💾 缓存命中' : '⚡ 降级策略'}
-                    </span>
-                  </div>
+                <h4 className="text-lg font-medium text-[#111827] mb-3 dark:text-white flex items-center">
+                  <span className="mr-2">💡</span>
+                  AI分析建议
+                </h4>
+                <div className="bg-[#F5F7FF] dark:bg-[#141926] rounded-lg p-4">
+                  {cropResult.analysis ? (
+                    <div>
+                      <p className="text-[#111827] dark:text-gray-200 font-medium mb-2">
+                        {cropResult.analysis.方案标题 || "AI智能裁剪方案"}
+                      </p>
+                      <p className="text-[#374151] dark:text-gray-300 text-sm">
+                        {cropResult.analysis.效果 || "AI正在分析图片的最佳裁剪方案..."}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-[#374151] dark:text-gray-300">展示AI分析建议</p>
+                  )}
                 </div>
               </div>
 
-              {/* Visual Preview */}
+              {/* Crop Parameters */}
               <div>
-                <h4 className="text-lg font-medium text-gray-900 mb-3 dark:text-white">👁️ 裁剪预览</h4>
-                <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
-                  <div className="text-center text-gray-500 dark:text-gray-400 text-sm mb-4">
-                    裁剪区域预览
-                  </div>
-                  <div className="border-2 border-dashed border-blue-400 rounded-lg p-8 text-center">
-                    <div className="text-blue-600 mb-2">
-                      <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+                <h4 className="text-lg font-medium text-[#FF6B4A] mb-3 dark:text-orange-300 flex items-center">
+                  <span className="mr-2">👁️</span>
+                  裁剪参数
+                </h4>
+                <div className="bg-[#FFF6EB] dark:bg-[#1C1712] rounded-lg p-4">
+                  <div className="space-y-2 text-sm">
+                    {cropResult.crop_params && (
+                      <>
+                        <div className="flex justify-between">
+                          <span className="text-[#6B7280] dark:text-gray-400">原始尺寸:</span>
+                          <span className="font-mono text-[#374151] dark:text-gray-300">
+                            {cropResult.metadata?.original?.width || "×"} × {cropResult.metadata?.original?.height || "×"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#6B7280] dark:text-gray-400">裁剪区域:</span>
+                          <span className="font-mono text-[#374151] dark:text-gray-300">
+                            {cropResult.crop_params.width || "×"} × {cropResult.crop_params.height || "×"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#6B7280] dark:text-gray-400">裁剪位置:</span>
+                          <span className="font-mono text-[#374151] dark:text-gray-300">
+                            ({cropResult.crop_params.x || 0}, {cropResult.crop_params.y || 0})
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-[#6B7280] dark:text-gray-400">输出尺寸:</span>
+                          <span className="font-mono text-[#374151] dark:text-gray-300">
+                            {cropResult.metadata?.cropped?.width || "×"} × {cropResult.metadata?.cropped?.height || "×"}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-[#6B7280] dark:text-gray-400">数据源:</span>
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        🤖 AI模型
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      裁剪后尺寸: {cropResult.crop_params?.output_size?.[0]} × {cropResult.crop_params?.output_size?.[1]}
-                    </p>
+                  </div>
+
+                  {/* Download and Reset Buttons */}
+                  <div className="flex justify-between items-center mt-4">
+                    <Button
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setCropResult(null);
+                        setError(null);
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="text-sm border-[#E7EAF0] text-[#374151] hover:bg-[#FAFAFB]"
+                    >
+                      🔄 重新开始
+                    </Button>
+                    {cropResult.output?.download_url && (
+                      <Button
+                        onClick={() => window.open(`http://localhost:3002${cropResult.output.download_url}`, '_blank')}
+                        className="bg-[#FF6B4A] hover:bg-[#E85E43] text-white text-sm font-medium shadow-sm"
+                        size="sm"
+                      >
+                        📥 下载结果
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
