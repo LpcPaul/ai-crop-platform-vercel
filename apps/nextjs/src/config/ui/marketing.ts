@@ -20,10 +20,11 @@ export const getMarketingConfig = async ({
         title: dict.marketing.main_nav_features,
         href: `/#features`,
       },
-      {
-        title: dict.marketing.main_nav_pricing,
-        href: `/pricing`,
-      },
+      // Hidden for v1.0 launch - no pricing/payment features
+      // {
+      //   title: dict.marketing.main_nav_pricing,
+      //   href: `/pricing`,
+      // },
       {
         title: dict.marketing.main_nav_blog,
         href: `/blog`,

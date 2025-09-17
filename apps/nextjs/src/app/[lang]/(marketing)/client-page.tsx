@@ -231,7 +231,8 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                 </div>
               </div>
 
-              {/* Auth buttons */}
+              {/* Auth buttons - Hidden for v1.0 launch */}
+              {/*
               <Button
                 variant="outline"
                 size="sm"
@@ -251,6 +252,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
               >
                 {dict.marketing.signup || "注册"}
               </Button>
+              */}
             </div>
           </div>
         </div>

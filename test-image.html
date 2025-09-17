@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试图片裁剪API</title>
+</head>
+<body>
+    <h1>图片裁剪API测试</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <button onclick="testCrop()">测试裁剪</button>
+    <div id="result"></div>
+
+    <script>
+        async function testCrop() {
+            const input = document.getElementById('imageInput');
+            const file = input.files[0];
+            if (!file) {
+                alert('请选择图片');
+                return;
+            }
+
+            const startTime = Date.now();
+            console.log('开始测试:', new Date().toLocaleTimeString());
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch('http://localhost:3002/api/crop/aesthetic', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                console.log('请求完成，耗时:', duration + 'ms');
+
+                const result = await response.json();
+                console.log('API响应:', result);
+
+                document.getElementById('result').innerHTML = `
+                    <h3>测试结果</h3>
+                    <p>耗时: ${duration}ms</p>
+                    <p>状态: ${response.status}</p>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('请求失败:', error);
+                document.getElementById('result').innerHTML = `
+                    <h3>测试失败</h3>
+                    <p>错误: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
