@@ -371,7 +371,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                     {dict.crop?.upload_hint || "拖拽图片到这里或点击选择文件"}
                   </p>
                   <p className="text-sm text-[#6B7280] dark:text-gray-400 mt-1">
-                    支持 JPG, PNG, WEBP 格式
+                    {dict.marketing.supported_formats}
                   </p>
                 </div>
                 <Button
@@ -669,10 +669,6 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
 
       </main>
 
-      {/* Footer */}
-      <footer className="mt-12 py-8 text-center text-gray-500 dark:text-gray-400 text-sm">
-        <p>AI智能裁剪工具 - 让每一张照片都有完美构图</p>
-      </footer>
     </div>
   );
 }
