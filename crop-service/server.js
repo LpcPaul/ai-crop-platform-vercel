@@ -135,36 +135,49 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
   const axios = require('axios');
   const fs = require('fs').promises;
   
-  // 加载新的prompt模板
+  // 加载新的prompt模板（优先使用v1.1版本）
   let promptTemplate;
   try {
     promptTemplate = await fs.readFile(
-      path.join(__dirname, 'prompts', `v0.5-${mode}.txt`), 
+      path.join(__dirname, 'prompts', `v1.1-${mode}.txt`),
       'utf-8'
     );
+    console.log(`[GPT] 使用 v1.1-${mode}.txt prompt版本`);
   } catch (error) {
-    console.warn('无法加载v0.5 prompt文件，尝试v0.4版本');
+    console.warn('无法加载v1.1 prompt文件，尝试v0.5版本');
     try {
       promptTemplate = await fs.readFile(
-        path.join(__dirname, 'prompts', `v0.4-${mode}.txt`), 
+        path.join(__dirname, 'prompts', `v0.5-${mode}.txt`),
         'utf-8'
       );
+      console.log(`[GPT] 使用 v0.5-${mode}.txt prompt版本`);
     } catch (error2) {
-      console.warn('无法加载v0.4 prompt文件，尝试v0.3版本');
+      console.warn('无法加载v0.5 prompt文件，尝试v0.4版本');
       try {
         promptTemplate = await fs.readFile(
-          path.join(__dirname, 'prompts', `v0.3-${mode}.txt`), 
+          path.join(__dirname, 'prompts', `v0.4-${mode}.txt`),
           'utf-8'
         );
+        console.log(`[GPT] 使用 v0.4-${mode}.txt prompt版本`);
       } catch (error3) {
-        console.warn('无法加载v0.3 prompt文件，尝试v0.2版本');
+        console.warn('无法加载v0.4 prompt文件，尝试v0.3版本');
         try {
           promptTemplate = await fs.readFile(
-            path.join(__dirname, 'prompts', `v0.2-${mode}.txt`), 
+            path.join(__dirname, 'prompts', `v0.3-${mode}.txt`),
             'utf-8'
           );
+          console.log(`[GPT] 使用 v0.3-${mode}.txt prompt版本`);
         } catch (error4) {
-          console.warn('无法加载v0.2 prompt文件，使用内置模板');
+          console.warn('无法加载v0.3 prompt文件，尝试v0.2版本');
+          try {
+            promptTemplate = await fs.readFile(
+              path.join(__dirname, 'prompts', `v0.2-${mode}.txt`),
+              'utf-8'
+            );
+            console.log(`[GPT] 使用 v0.2-${mode}.txt prompt版本`);
+          } catch (error5) {
+            console.warn('无法加载v0.2 prompt文件，使用内置模板');
+            console.log(`[GPT] 使用内置 prompt模板`);
             promptTemplate = `你是专业的图片裁剪专家。坐标原点为左上角，单位为像素。
 **输入：** 原图尺寸 (${originalWidth}×${originalHeight})。
 **目标：** 让图片更美观、更有视觉冲击力。
@@ -186,6 +199,7 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
     "y_norm": 0.50
   }
 }`;
+          }
         }
       }
     }
