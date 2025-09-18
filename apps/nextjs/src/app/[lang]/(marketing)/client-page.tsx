@@ -5,6 +5,7 @@ import { cn } from "@saasfly/ui";
 import { Button } from "@saasfly/ui/button";
 import { Locale, localeMap } from "~/config/i18n-config";
 import { LocaleChange } from "~/components/locale-change";
+import { translateStaticTerms } from "~/utils/translate";
 
 interface ClientIndexPageProps {
   dict: any;
@@ -45,6 +46,10 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
   // 图片尺寸状态
   const [originalImageDimensions, setOriginalImageDimensions] = useState<{width: number, height: number} | null>(null);
   const [croppedImageDimensions, setCroppedImageDimensions] = useState<{width: number, height: number} | null>(null);
+
+  // Translation states
+  const [translatedTitle, setTranslatedTitle] = useState<string>("");
+  const [translatedDescription, setTranslatedDescription] = useState<string>("");
 
   // 切换视图大小
   const toggleViewSize = () => {
@@ -203,6 +208,17 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
       const result = await response.json();
       setCropResult(result);
 
+      // Translate analysis content if not in Chinese
+      if (result.analysis && lang !== 'zh') {
+        const title = translateStaticTerms(result.analysis.title || '', lang);
+        const description = translateStaticTerms(result.analysis.effection || '', lang);
+        setTranslatedTitle(title);
+        setTranslatedDescription(description);
+      } else {
+        setTranslatedTitle(result.analysis?.title || '');
+        setTranslatedDescription(result.analysis?.effection || '');
+      }
+
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         setError('请求超时，请稍后重试');
@@ -249,6 +265,17 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
 
       // Store the result for display
       setCropResult(result);
+
+      // Translate analysis content if not in Chinese
+      if (result.analysis && lang !== 'zh') {
+        const title = translateStaticTerms(result.analysis.title || '', lang);
+        const description = translateStaticTerms(result.analysis.effection || '', lang);
+        setTranslatedTitle(title);
+        setTranslatedDescription(description);
+      } else {
+        setTranslatedTitle(result.analysis?.title || '');
+        setTranslatedDescription(result.analysis?.effection || '');
+      }
 
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -412,7 +439,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                   </div>
                   <div className="flex justify-center space-x-4 flex-wrap">
                     <Button onClick={handleCropProcess} size="lg" className="bg-[#FF6B4A] hover:bg-[#E85E43] text-white shadow-md font-medium">
-                      ✨ AI自动裁剪
+                      ✨ {dict.crop?.auto_crop || "AI自动裁剪"}
                     </Button>
                     <Button
                       onClick={() => {
@@ -454,9 +481,9 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
         {cropResult && (
           <div className="bg-white rounded-2xl shadow-[0_8px_32px_rgba(16,24,40,0.06)] border border-[#E7EAF0] p-8 dark:bg-[#0E1116] dark:border-gray-700">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-semibold text-[#111827] dark:text-white">🎯 AI分析结果</h3>
+              <h3 className="text-2xl font-semibold text-[#111827] dark:text-white">🎯 {dict.crop?.ai_analysis_results || "AI分析结果"}</h3>
               <p className="text-sm text-[#6B7280] mt-2 dark:text-gray-400">
-                💡 点击图片、轻扫或按键切换查看模式
+                💡 {dict.crop?.view_mode_hint || "点击图片、轻扫或按键切换查看模式"}
               </p>
             </div>
 
@@ -464,16 +491,16 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
             <div className="mb-6">
               <h4 className="text-lg font-medium text-[#FF6B4A] mb-3 dark:text-orange-300 flex items-center">
                 <span className="mr-2">💡</span>
-                AI裁剪方案
+                {dict.crop?.ai_cropping_solution || "AI裁剪方案"}
               </h4>
               <div className="bg-[#FFF6EB] dark:bg-[#1C1712] rounded-lg p-4">
                 {cropResult.analysis ? (
                   <div>
                     <p className="text-[#111827] dark:text-gray-200 font-medium mb-2">
-                      {cropResult.analysis.方案标题 || "AI智能裁剪方案"}
+                      {cropResult.analysis.title || dict.crop?.analysis_title_fallback || "AI智能裁剪方案"}
                     </p>
                     <p className="text-[#374151] dark:text-gray-300 text-base">
-                      {cropResult.analysis.效果 || "AI正在分析图片的最佳裁剪方案..."}
+                      {cropResult.analysis.effection || dict.crop?.analysis_description_fallback || "AI正在分析图片的最佳裁剪方案..."}
                     </p>
                   </div>
                 ) : (
@@ -526,7 +553,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
 
                           {/* 角标 - 已移除，避免遮挡画面 */}
                         </div>
-                        <div className="mt-2 text-center text-sm font-medium text-[#374151] dark:text-gray-200">原图</div>
+                        <div className="mt-2 text-center text-sm font-medium text-[#374151] dark:text-gray-200">{dict.crop?.original_image || "原图"}</div>
                       </div>
                     </div>
 
@@ -561,7 +588,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
 
                           {/* 角标 - 已移除，避免遮挡画面 */}
                         </div>
-                        <div className="mt-2 text-center text-sm font-medium text-[#374151] dark:text-gray-200">裁剪结果</div>
+                        <div className="mt-2 text-center text-sm font-medium text-[#374151] dark:text-gray-200">{dict.crop?.cropped_result || "裁剪结果"}</div>
                       </div>
                     </div>
                   </div>
@@ -572,12 +599,12 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                       <Dot
                         active={showOriginalLarge}
                         onClick={() => setShowOriginalLarge(true)}
-                        label="切换到原图大图视图"
+                        label={dict.crop?.original_image || "原图"}
                       />
                       <Dot
                         active={!showOriginalLarge}
                         onClick={() => setShowOriginalLarge(false)}
-                        label="切换到裁剪结果大图视图"
+                        label={dict.crop?.cropped_result || "裁剪结果"}
                       />
                     </div>
 
@@ -593,7 +620,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                         size="sm"
                         className="text-sm border-[#E7EAF0] text-[#374151] hover:bg-[#FAFAFB]"
                       >
-                        🔄 重新开始
+                        🔄 {dict.crop?.restart || "重新开始"}
                       </Button>
                       {cropResult.output?.download_url && (
                         <Button
@@ -601,7 +628,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                           className="bg-[#FF6B4A] hover:bg-[#E85E43] text-white text-sm font-medium shadow-sm"
                           size="sm"
                         >
-                          📥 下载裁剪结果
+                          📥 {dict.crop?.download_result || "下载裁剪结果"}
                         </Button>
                       )}
                     </div>
@@ -613,7 +640,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                     <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p>裁剪结果生成中...</p>
+                    <p>{dict.crop?.processing || "处理中..."}</p>
                   </div>
                 </div>
               )}
@@ -623,32 +650,32 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
             <div>
               <h4 className="text-lg font-medium text-[#FF6B4A] mb-3 dark:text-orange-300 flex items-center">
                 <span className="mr-2">👁️</span>
-                裁剪参数
+                {dict.crop?.crop_parameters || "裁剪参数"}
               </h4>
               <div className="bg-[#FFF6EB] dark:bg-[#1C1712] rounded-lg p-4">
                 <div className="space-y-2 text-sm">
                   {cropResult.crop_params && (
                     <>
                       <div className="flex justify-between">
-                        <span className="text-[#6B7280] dark:text-gray-400">原始尺寸:</span>
+                        <span className="text-[#6B7280] dark:text-gray-400">{dict.crop?.original_size || "原始尺寸"}:</span>
                         <span className="font-mono text-[#374151] dark:text-gray-300">
                           {cropResult.metadata?.original?.width || "×"} × {cropResult.metadata?.original?.height || "×"}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#6B7280] dark:text-gray-400">裁剪区域:</span>
+                        <span className="text-[#6B7280] dark:text-gray-400">{dict.crop?.crop_area || "裁剪区域"}:</span>
                         <span className="font-mono text-[#374151] dark:text-gray-300">
                           {cropResult.crop_params.width || "×"} × {cropResult.crop_params.height || "×"}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#6B7280] dark:text-gray-400">裁剪位置:</span>
+                        <span className="text-[#6B7280] dark:text-gray-400">{dict.crop?.crop_position || "裁剪位置"}:</span>
                         <span className="font-mono text-[#374151] dark:text-gray-300">
                           ({cropResult.crop_params.x || 0}, {cropResult.crop_params.y || 0})
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-[#6B7280] dark:text-gray-400">输出尺寸:</span>
+                        <span className="text-[#6B7280] dark:text-gray-400">{dict.crop?.output_size || "输出尺寸"}:</span>
                         <span className="font-mono text-[#374151] dark:text-gray-300">
                           {cropResult.metadata?.cropped?.width || "×"} × {cropResult.metadata?.cropped?.height || "×"}
                         </span>
@@ -656,9 +683,9 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                     </>
                   )}
                   <div className="flex justify-between">
-                    <span className="text-[#6B7280] dark:text-gray-400">数据源:</span>
+                    <span className="text-[#6B7280] dark:text-gray-400">{dict.crop?.data_source || "数据源"}:</span>
                     <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      🤖 AI模型
+                      🤖 {dict.crop?.ai_model || "AI模型"}
                     </span>
                   </div>
                 </div>

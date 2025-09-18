@@ -86,6 +86,23 @@
     "select_image": "画像を選択",
     "processing": "処理中...",
     "download": "結果をダウンロード",
-    "reset": "リセット"
+    "reset": "リセット",
+    "analysis_title_fallback": "AIスマートクロップソリューション",
+    "analysis_description_fallback": "AIがあなたの画像の最適なクロップ戦略を分析しています...",
+    "ai_analysis_results": "AI分析結果",
+    "view_mode_hint": "画像をクリック、スワイプまたはキーで表示モードを切り替え",
+    "ai_cropping_solution": "AIクロップソリューション",
+    "original_image": "オリジナル",
+    "cropped_result": "クロップ結果",
+    "auto_crop": "AI自動クロップ",
+    "restart": "再開",
+    "download_result": "クロップ結果をダウンロード",
+    "crop_parameters": "クロップパラメータ",
+    "original_size": "オリジナルサイズ",
+    "crop_area": "クロップ範囲",
+    "crop_position": "クロップ位置",
+    "output_size": "出力サイズ",
+    "data_source": "データソース",
+    "ai_model": "AIモデル"
   }
 }

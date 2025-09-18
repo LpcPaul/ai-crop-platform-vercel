@@ -132,6 +132,23 @@
     "select_image": "选择图片",
     "processing": "正在处理中...",
     "download": "下载结果",
-    "reset": "重新选择"
+    "reset": "重新选择",
+    "analysis_title_fallback": "AI智能裁剪方案",
+    "analysis_description_fallback": "AI正在分析图片的最佳裁剪方案...",
+    "ai_analysis_results": "AI分析结果",
+    "view_mode_hint": "点击图片、轻扫或按键切换查看模式",
+    "ai_cropping_solution": "AI裁剪方案",
+    "original_image": "原图",
+    "cropped_result": "裁剪结果",
+    "auto_crop": "AI自动裁剪",
+    "restart": "重新开始",
+    "download_result": "下载裁剪结果",
+    "crop_parameters": "裁剪参数",
+    "original_size": "原始尺寸",
+    "crop_area": "裁剪区域",
+    "crop_position": "裁剪位置",
+    "output_size": "输出尺寸",
+    "data_source": "数据源",
+    "ai_model": "AI模型"
   }
 }

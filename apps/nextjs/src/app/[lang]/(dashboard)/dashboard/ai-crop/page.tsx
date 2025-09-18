@@ -6,8 +6,8 @@ interface CropResult {
   originalFilename: string;
   croppedFilename: string;
   analysis: {
-    方案标题: string;
-    效果: string;
+    title: string;
+    effection: string;
   };
   crop_params: {
     x: number;
@@ -563,11 +563,11 @@ export default function AICropPage() {
                   <h3>AI分析结果</h3>
                   <div className="analysis-item">
                     <div className="analysis-label">推荐方案</div>
-                    <div className="analysis-content">{cropResult.analysis.方案标题}</div>
+                    <div className="analysis-content">{cropResult.analysis.title}</div>
                   </div>
                   <div className="analysis-item">
                     <div className="analysis-label">效果说明</div>
-                    <div className="analysis-content">{cropResult.analysis.效果}</div>
+                    <div className="analysis-content">{cropResult.analysis.effection}</div>
                   </div>
                 </div>
 

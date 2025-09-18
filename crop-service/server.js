@@ -185,8 +185,8 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
 请返回JSON格式：
 {
   "analysis": {
-    "方案标题": "简洁的方案名称",
-    "效果": "具体的视觉效果描述"
+    "title": "简洁的方案名称",
+    "effection": "具体的视觉效果描述"
   },
   "crop_params": {
     "x": 起始X坐标,
@@ -319,8 +319,8 @@ function generateFallbackCrop(mode, originalWidth = 1080, originalHeight = 1350)
   const aestheticCrops = [
     {
       analysis: {
-        "方案标题": "上方留白聚焦",
-        "效果": "强化前景主体故事感。去除上方干扰元素，增加下方主体权重，远近对比更加明显。"
+        "title": "上方留白聚焦",
+        "effection": "强化前景主体故事感。去除上方干扰元素，增加下方主体权重，远近对比更加明显。"
       },
       crop_params: {
         x: Math.floor(originalWidth * 0.1),
@@ -331,8 +331,8 @@ function generateFallbackCrop(mode, originalWidth = 1080, originalHeight = 1350)
     },
     {
       analysis: {
-        "方案标题": "紧密框架突出",
-        "效果": "突出中心主体的细节表达。裁掉边缘分散注意力的元素，主体占据画面核心区域，情绪传达更直接。"
+        "title": "紧密框架突出",
+        "effection": "突出中心主体的细节表达。裁掉边缘分散注意力的元素，主体占据画面核心区域，情绪传达更直接。"
       },
       crop_params: {
         x: Math.floor(originalWidth * 0.15),
@@ -343,8 +343,8 @@ function generateFallbackCrop(mode, originalWidth = 1080, originalHeight = 1350)
     },
     {
       analysis: {
-        "方案标题": "方形平衡取景",
-        "效果": "营造稳定的视觉节奏感。保持主体居中位置，去除多余边缘内容，整体画面更加紧凑统一。"
+        "title": "方形平衡取景",
+        "effection": "营造稳定的视觉节奏感。保持主体居中位置，去除多余边缘内容，整体画面更加紧凑统一。"
       },
       crop_params: {
         x: Math.floor(originalWidth * 0.2),
@@ -771,7 +771,7 @@ function validateAndReturnResult(result, originalWidth, originalHeight, model) {
     throw new Error('裁剪参数越界：超出原图范围');
   }
 
-  console.log(`[${model}] 分析成功 - 方案: ${result.analysis.方案标题}`);
+  console.log(`[${model}] 分析成功 - 方案: ${result.analysis.title}`);
   
   return {
     success: true,

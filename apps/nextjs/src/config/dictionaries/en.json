@@ -132,6 +132,23 @@
     "select_image": "Select Image",
     "processing": "Processing...",
     "download": "Download Result",
-    "reset": "Reset"
+    "reset": "Reset",
+    "analysis_title_fallback": "AI Smart Cropping Solution",
+    "analysis_description_fallback": "AI is analyzing the optimal cropping strategy for your image...",
+    "ai_analysis_results": "AI Analysis Results",
+    "view_mode_hint": "Click image, swipe or press keys to switch view mode",
+    "ai_cropping_solution": "AI Cropping Solution",
+    "original_image": "Original",
+    "cropped_result": "Cropped Result",
+    "auto_crop": "AI Auto Crop",
+    "restart": "Restart",
+    "download_result": "Download Cropped Result",
+    "crop_parameters": "Crop Parameters",
+    "original_size": "Original Size",
+    "crop_area": "Crop Area",
+    "crop_position": "Crop Position",
+    "output_size": "Output Size",
+    "data_source": "Data Source",
+    "ai_model": "AI Model"
   }
 }
