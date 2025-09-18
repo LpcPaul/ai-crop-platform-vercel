@@ -45,7 +45,7 @@ export function isNoNeedProcess(request: NextRequest): boolean {
   return noNeedProcessRoute.some((route) => new RegExp(route).test(pathname));
 }
 
-function addSecurityHeaders(response: NextResponse): NextResponse {
+function addSecurityHeaders(response: NextResponse, locale?: string): NextResponse {
   // Security Headers
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
@@ -55,6 +55,11 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()'
   );
+
+  // Add Content-Language header if locale is provided
+  if (locale) {
+    response.headers.set('Content-Language', locale);
+  }
 
   // Content Security Policy
   if (process.env.NODE_ENV === 'production') {
@@ -151,32 +156,34 @@ export const middleware = clerkMiddleware(async (auth, req: NextRequest) => {
     return corsResult; // Return early for CORS violations or preflight requests
   }
 
+  // Extract locale early for use throughout the middleware
+  const locale = getLocale(req);
+
   if (isNoNeedProcess(req)) {
     const response = NextResponse.next();
-    return addSecurityHeaders(response);
+    return addSecurityHeaders(response, locale);
   }
 
   const isWebhooksRoute = req.nextUrl.pathname.startsWith("/api/webhooks/");
   if (isWebhooksRoute) {
     const response = NextResponse.next();
-    return addSecurityHeaders(response);
+    return addSecurityHeaders(response, locale);
   }
   const pathname = req.nextUrl.pathname;
   // Check if there is any supported locale in the pathname
   const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) =>
-      !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
+    (loc) =>
+      !pathname.startsWith(`/${loc}/`) && pathname !== `/${loc}`,
   );
   // Redirect if there is no locale
   if (!isNoRedirect(req) && pathnameIsMissingLocale) {
-    const locale = getLocale(req);
     const redirectResponse = NextResponse.redirect(
       new URL(
         `/${locale}${pathname.startsWith("/") ? "" : "/"}${pathname}`,
         req.url,
       ),
     );
-    return addSecurityHeaders(redirectResponse);
+    return addSecurityHeaders(redirectResponse, locale);
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -200,10 +207,9 @@ export const middleware = clerkMiddleware(async (auth, req: NextRequest) => {
     req.nextUrl.pathname,
   );
   const isAuthRoute = req.nextUrl.pathname.startsWith("/api/trpc/");
-  const locale = getLocale(req);
   if (isAuthRoute && isAuth) {
     const response = NextResponse.next();
-    return addSecurityHeaders(response);
+    return addSecurityHeaders(response, locale);
   }
   if (req.nextUrl.pathname.startsWith("/admin/dashboard")) {
     if (!isAuth || !isAdmin) {
@@ -211,12 +217,12 @@ export const middleware = clerkMiddleware(async (auth, req: NextRequest) => {
       return addSecurityHeaders(redirectResponse);
     }
     const response = NextResponse.next();
-    return addSecurityHeaders(response);
+    return addSecurityHeaders(response, locale);
   }
   if (isAuthPage) {
     if (isAuth) {
       const redirectResponse = NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url));
-      return addSecurityHeaders(redirectResponse);
+      return addSecurityHeaders(redirectResponse, locale);
     }
     return null;
   }
@@ -228,6 +234,6 @@ export const middleware = clerkMiddleware(async (auth, req: NextRequest) => {
     const redirectResponse = NextResponse.redirect(
       new URL(`/${locale}/login-clerk?from=${encodeURIComponent(from)}`, req.url),
     );
-    return addSecurityHeaders(redirectResponse);
+    return addSecurityHeaders(redirectResponse, locale);
   }
 })

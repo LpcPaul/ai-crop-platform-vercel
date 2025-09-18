@@ -24,6 +24,8 @@ const config = {
   experimental: {
     mdxRs: true,
     // serverActions: true,
+    optimizePackageImports: ["@saasfly/ui"],
+    optimizeCss: true,
   },
   images: {
     domains: ["images.unsplash.com", "avatars.githubusercontent.com", "www.twillot.com", "cdnv2.ruguoapp.com", "www.setupyourpay.com"],

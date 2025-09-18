@@ -131,18 +131,30 @@ function validateAndFixCropParams(cropParams, originalWidth, originalHeight) {
 // 注意：v0.5版本已移除subject_anchor_hint字段
 
 // GPT-4.1 Vision API调用（带参数验证和二次请求）
-async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode = 'aesthetic') {
+async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode = 'aesthetic', language = 'zh') {
   const axios = require('axios');
   const fs = require('fs').promises;
   
-  // 加载新的prompt模板（优先使用v1.1版本）
+  // 语言映射表
+  const languageMap = {
+    'en': 'English',
+    'zh': '',  // 中文版本不需要后缀
+    'es': 'Spanish',
+    'ja': 'Japanese'
+  };
+
+  // 根据语言生成prompt文件名后缀
+  const languageSuffix = languageMap[language] ? `_${languageMap[language]}` : '';
+
+  // 加载多语言prompt模板（优先使用v1.1版本）
   let promptTemplate;
   try {
+    const promptFileName = `v1.1-${mode}${languageSuffix}.txt`;
     promptTemplate = await fs.readFile(
-      path.join(__dirname, 'prompts', `v1.1-${mode}.txt`),
+      path.join(__dirname, 'prompts', promptFileName),
       'utf-8'
     );
-    console.log(`[GPT] 使用 v1.1-${mode}.txt prompt版本`);
+    console.log(`[GPT] 使用 ${promptFileName} prompt版本 (语言: ${language})`);
   } catch (error) {
     console.warn('无法加载v1.1 prompt文件，尝试v0.5版本');
     try {
@@ -440,8 +452,11 @@ app.post('/api/crop/aesthetic', upload.single('image'), async (req, res) => {
     // 转换为Base64供GPT分析
     const imageBase64 = req.file.buffer.toString('base64');
     
+    // 获取语言参数
+    const language = req.body.language || 'zh'; // 默认中文
+
     // 调用GPT-4.1 Vision进行美学分析
-    const analysisResult = await callGPTVisionAPI(imageBase64, originalWidth, originalHeight, 'aesthetic');
+    const analysisResult = await callGPTVisionAPI(imageBase64, originalWidth, originalHeight, 'aesthetic', language);
     
     // 执行智能裁剪 (默认PNG格式，保持原图质量)
     const cropResult = await performSmartCrop(

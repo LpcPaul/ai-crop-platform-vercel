@@ -11,6 +11,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "@saasfly/ui";
 import { Toaster } from "@saasfly/ui/toaster";
 
+import { LangUpdater } from "~/components/lang-updater";
 import { TailwindIndicator } from "~/components/tailwind-indicator";
 import { ThemeProvider } from "~/components/theme-provider";
 import { i18n } from "~/config/i18n-config";
@@ -95,6 +96,7 @@ export default function RootLayout({
           defaultTheme="light"
           enableSystem={false}
         >
+          <LangUpdater />
           <NextDevtoolsProvider>{children}</NextDevtoolsProvider>
           <Analytics />
           <SpeedInsights />

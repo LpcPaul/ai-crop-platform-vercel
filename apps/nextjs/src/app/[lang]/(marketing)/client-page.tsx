@@ -185,6 +185,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
       formData.append('image', selectedFile);
       formData.append('scene', 'instagram-post');
       formData.append('ratio', '1:1');
+      formData.append('language', lang);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
@@ -241,6 +242,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
       formData.append('image', selectedFile);
       formData.append('scene', 'instagram-post');
       formData.append('ratio', '1:1');
+      formData.append('language', lang);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
