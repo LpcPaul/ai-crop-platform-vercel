@@ -92,7 +92,29 @@ export class SecurityValidator {
   }
 
   static isValidOrigin(origin: string): boolean {
-    return config.security.corsOrigins.includes(origin);
+    if (!origin) {
+      return false;
+    }
+
+    try {
+      const url = new URL(origin);
+      const normalizedOrigin = `${url.protocol}//${url.host}`;
+
+      if (config.security.corsOrigins.includes(normalizedOrigin)) {
+        return true;
+      }
+
+      const isLocalRequest =
+        url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+
+      if (isLocalRequest && process.env.NODE_ENV !== 'production') {
+        return true;
+      }
+    } catch (error) {
+      console.warn('Failed to parse origin for validation:', error);
+    }
+
+    return false;
   }
 
   static maskSensitiveData(data: any): any {

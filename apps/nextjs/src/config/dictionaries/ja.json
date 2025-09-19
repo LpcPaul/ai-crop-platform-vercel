@@ -102,7 +102,6 @@
     "crop_area": "クロップ範囲",
     "crop_position": "クロップ位置",
     "output_size": "出力サイズ",
-    "data_source": "データソース",
     "ai_model": "AIモデル"
   }
 }

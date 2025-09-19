@@ -148,7 +148,6 @@
     "crop_area": "Crop Area",
     "crop_position": "Crop Position",
     "output_size": "Output Size",
-    "data_source": "Data Source",
     "ai_model": "AI Model"
   }
 }

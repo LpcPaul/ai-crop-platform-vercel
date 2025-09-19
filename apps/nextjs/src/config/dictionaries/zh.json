@@ -148,7 +148,6 @@
     "crop_area": "裁剪区域",
     "crop_position": "裁剪位置",
     "output_size": "输出尺寸",
-    "data_source": "数据源",
     "ai_model": "AI模型"
   }
 }

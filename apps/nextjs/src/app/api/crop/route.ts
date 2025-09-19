@@ -51,14 +51,24 @@ export async function POST(request: NextRequest) {
     }
 
     let imageHash: string | undefined;
+    let formatAwareCacheKey: string | undefined;
+
     if (config.performance.enableDedupCache) {
       const imageArrayBuffer = await imageFile.arrayBuffer();
       const imageBase64 = Buffer.from(imageArrayBuffer).toString('base64');
       imageHash = ImageProcessor.generateImageHash(imageBase64);
 
-      const cachedResult = await getCachedResult(imageHash);
+      // Create format-aware cache key: hash + original format
+      const fileExtension = imageFile.name.split('.').pop()?.toLowerCase() || 'unknown';
+      formatAwareCacheKey = `${imageHash}:${fileExtension}:${imageFile.type}`;
+
+      const cachedResult = await getCachedResult(formatAwareCacheKey);
       if (cachedResult) {
-        SecurityValidator.logSecurityEvent('cache_hit', { imageHash, clientIp }, 'info');
+        SecurityValidator.logSecurityEvent('cache_hit', {
+          imageHash,
+          formatAwareCacheKey,
+          clientIp
+        }, 'info');
         return NextResponse.json({
           ...cachedResult,
           cached: true,
@@ -92,19 +102,32 @@ export async function POST(request: NextRequest) {
 
       const result = await response.json();
 
-      const metadata = ImageProcessor.extractImageMetadata(imageFile);
+      const fileMetadata = ImageProcessor.extractImageMetadata(imageFile);
       const enhancedResult = {
         ...result,
-        metadata,
+        metadata: {
+          ...(typeof result.metadata === 'object' && result.metadata !== null ? result.metadata : {}),
+          file: fileMetadata,
+        },
         imageHash,
+        formatAwareCacheKey,
+        originalFormat: {
+          name: imageFile.name,
+          type: imageFile.type,
+          extension: imageFile.name.split('.').pop()?.toLowerCase() || 'unknown'
+        },
         processingTime: Date.now() - startTime,
         timestamp: new Date().toISOString(),
         cached: false,
       };
 
-      if (config.performance.enableDedupCache && imageHash) {
-        await cacheResult(imageHash, enhancedResult);
-        SecurityValidator.logSecurityEvent('cache_store', { imageHash, clientIp }, 'info');
+      if (config.performance.enableDedupCache && formatAwareCacheKey) {
+        await cacheResult(formatAwareCacheKey, enhancedResult);
+        SecurityValidator.logSecurityEvent('cache_store', {
+          imageHash,
+          formatAwareCacheKey,
+          clientIp
+        }, 'info');
       }
 
       if (config.monitoring.enableLogging) {

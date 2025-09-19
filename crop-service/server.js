@@ -6,10 +6,113 @@ const path = require('path');
 const fs = require('fs').promises;
 const { v4: uuidv4 } = require('uuid');
 const rateLimit = require('express-rate-limit');
+const { createCanvas, loadImage } = require('canvas');
 require('dotenv').config();
+
+// Format configuration for different image types
+const FORMAT_CONFIG = {
+  // Standard formats - preserve original
+  'jpeg': { sharpFormat: 'jpeg', mimeType: 'image/jpeg', quality: 95 },
+  'jpg': { sharpFormat: 'jpeg', mimeType: 'image/jpeg', quality: 95 },
+  'png': { sharpFormat: 'png', mimeType: 'image/png', quality: 100 },
+  'webp': { sharpFormat: 'webp', mimeType: 'image/webp', quality: 90 },
+  'gif': { sharpFormat: 'gif', mimeType: 'image/gif', quality: 100 },
+  'avif': { sharpFormat: 'avif', mimeType: 'image/avif', quality: 85 },
+
+  // HEIC/HEIF formats - convert to JPEG
+  'heic': { sharpFormat: 'jpeg', outputExtension: 'jpg', mimeType: 'image/jpeg', quality: 85 },
+  'heif': { sharpFormat: 'jpeg', outputExtension: 'jpg', mimeType: 'image/jpeg', quality: 85 },
+
+  // BMP/TIFF formats - convert to PNG
+  'bmp': { sharpFormat: 'png', outputExtension: 'png', mimeType: 'image/png', quality: 100 },
+  'tiff': { sharpFormat: 'png', outputExtension: 'png', mimeType: 'image/png', quality: 100 },
+  'tif': { sharpFormat: 'png', outputExtension: 'png', mimeType: 'image/png', quality: 100 }
+};
+
+// Helper function to get format configuration
+function getFormatConfig(originalFilename, mimeType) {
+  // Extract extension from filename (preserve original case and exact extension)
+  const fileExtension = path.extname(originalFilename).toLowerCase().slice(1);
+
+  // Check if we have configuration for this extension
+  if (FORMAT_CONFIG[fileExtension]) {
+    const config = FORMAT_CONFIG[fileExtension];
+    return {
+      format: config.sharpFormat,
+      // Use outputExtension if specified (for format conversions), otherwise preserve original
+      extension: config.outputExtension || fileExtension,
+      config: config
+    };
+  }
+
+  // Fallback to mime type detection with new formats
+  const mimeMap = {
+    'image/jpeg': { format: 'jpeg', extension: 'jpg' },
+    'image/png': { format: 'png', extension: 'png' },
+    'image/webp': { format: 'webp', extension: 'webp' },
+    'image/gif': { format: 'gif', extension: 'gif' },
+    'image/avif': { format: 'avif', extension: 'avif' },
+    'image/heic': { format: 'heic', extension: 'heic' },
+    'image/heif': { format: 'heif', extension: 'heif' },
+    'image/bmp': { format: 'bmp', extension: 'bmp' },
+    'image/tiff': { format: 'tiff', extension: 'tiff' }
+  };
+
+  const mimeMapping = mimeMap[mimeType];
+  if (mimeMapping && FORMAT_CONFIG[mimeMapping.extension]) {
+    const config = FORMAT_CONFIG[mimeMapping.extension];
+    return {
+      format: config.sharpFormat,
+      extension: config.outputExtension || mimeMapping.extension,
+      config: config
+    };
+  }
+
+  // Ultimate fallback to PNG
+  return {
+    format: 'png',
+    extension: 'png',
+    config: FORMAT_CONFIG['png']
+  };
+}
+
+// BMP preprocessing function - convert unsupported BMP formats to PNG using Canvas
+async function preprocessBMP(imageBuffer) {
+  try {
+    console.log('预处理BMP图像 - 使用Canvas转换为PNG格式');
+
+    // Load image using Canvas
+    const image = await loadImage(imageBuffer);
+
+    // Create canvas with image dimensions
+    const canvas = createCanvas(image.width, image.height);
+    const ctx = canvas.getContext('2d');
+
+    // Draw image to canvas
+    ctx.drawImage(image, 0, 0);
+
+    // Convert to PNG buffer
+    const pngBuffer = canvas.toBuffer('image/png');
+
+    console.log(`BMP转PNG成功 - 原始大小: ${imageBuffer.length} bytes, PNG大小: ${pngBuffer.length} bytes`);
+
+    return {
+      buffer: pngBuffer,
+      processed: true,
+      originalFormat: 'bmp',
+      convertedFormat: 'png'
+    };
+  } catch (error) {
+    console.error('BMP预处理失败:', error.message);
+    throw new Error(`BMP format preprocessing failed: ${error.message}`);
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// 当服务部署在代理（如Next.js或反向代理）之后时，需要开启trust proxy以正确识别客户端IP
+app.set('trust proxy', 1);
 
 // 中间件配置
 app.use(cors());
@@ -37,14 +140,14 @@ const upload = multer({
     fileSize: 50 * 1024 * 1024 // 50MB限制
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const allowedTypes = /jpeg|jpg|png|gif|webp|avif|heic|heif|bmp|tiff|tif/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-    
+
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('只支持图片格式: jpeg, jpg, png, gif, webp'));
+      cb(new Error('只支持图片格式: jpeg, jpg, png, gif, webp, avif, heic, heif, bmp, tiff'));
     }
   }
 });
@@ -131,7 +234,14 @@ function validateAndFixCropParams(cropParams, originalWidth, originalHeight) {
 // 注意：v0.5版本已移除subject_anchor_hint字段
 
 // GPT-4.1 Vision API调用（带参数验证和二次请求）
-async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode = 'aesthetic', language = 'zh') {
+async function callGPTVisionAPI(
+  imageBase64,
+  originalWidth,
+  originalHeight,
+  mode = 'aesthetic',
+  language = 'zh',
+  mimeType = 'image/jpeg'
+) {
   const axios = require('axios');
   const fs = require('fs').promises;
   
@@ -239,7 +349,7 @@ async function callGPTVisionAPI(imageBase64, originalWidth, originalHeight, mode
               {
                 type: 'image_url',
                 image_url: {
-                  url: `data:image/jpeg;base64,${imageBase64}`
+                  url: `data:${mimeType};base64,${imageBase64}`
                 }
               }
             ]
@@ -368,34 +478,83 @@ function generateFallbackCrop(mode, originalWidth = 1080, originalHeight = 1350)
   ];
   
   const result = aestheticCrops[Math.floor(Math.random() * aestheticCrops.length)];
-  
+
+  const validation = validateAndFixCropParams(
+    result.crop_params,
+    originalWidth,
+    originalHeight
+  );
+
   // 添加验证信息标识这是备用算法
   result.validation_info = {
-    crop_errors: [],
-    anchor_errors: [],
+    crop_errors: validation.errors,
     attempt_count: 0,
     fallback_used: true
   };
-  
-  return result;
+
+  return {
+    analysis: result.analysis,
+    crop_params: validation.fixed,
+    validation_info: result.validation_info
+  };
 }
 
-// 智能裁剪处理
-async function performSmartCrop(imageBuffer, cropParams, format = 'png', quality = 95) {
+// 智能裁剪处理 - 支持格式保持
+async function performSmartCrop(imageBuffer, cropParams, originalFilename, mimeType) {
   const { x = 0, y = 0, width, height } = cropParams;
-  
+
   try {
+    // 获取格式配置
+    const { format, extension, config } = getFormatConfig(originalFilename, mimeType);
+
     let sharpImage = sharp(imageBuffer);
-    
+
     // 获取原图信息
     const metadata = await sharpImage.metadata();
-    
+
+    // sRGB色彩空间转换 - 如果色彩空间不是sRGB，转换到sRGB
+    if (metadata.colorSpace && metadata.colorSpace !== 'srgb') {
+      console.log(`Converting color space from ${metadata.colorSpace} to sRGB`);
+      sharpImage = sharpImage.colorspace('srgb');
+    }
+
     // 确保裁剪参数在有效范围内
     const validX = Math.max(0, Math.min(x, metadata.width - 50));
     const validY = Math.max(0, Math.min(y, metadata.height - 50));
     const validWidth = Math.min(width, metadata.width - validX);
     const validHeight = Math.min(height, metadata.height - validY);
-    
+
+    // 根据格式设置Sharp选项
+    const formatOptions = { quality: config.quality };
+
+    // 对于GIF格式，需要特殊处理
+    if (format === 'gif') {
+      // GIF处理：保持动画或转换为静态图
+      const croppedBuffer = await sharpImage
+        .extract({
+          left: validX,
+          top: validY,
+          width: validWidth,
+          height: validHeight
+        })
+        .gif()
+        .toBuffer();
+
+      return {
+        success: true,
+        buffer: croppedBuffer,
+        format: format,
+        extension: extension,
+        mimeType: config.mimeType,
+        config: config,
+        metadata: {
+          original: { width: metadata.width, height: metadata.height },
+          cropped: { width: validWidth, height: validHeight },
+          crop_area: { x: validX, y: validY, width: validWidth, height: validHeight }
+        }
+      };
+    }
+
     // 执行裁剪
     const croppedBuffer = await sharpImage
       .extract({
@@ -404,19 +563,23 @@ async function performSmartCrop(imageBuffer, cropParams, format = 'png', quality
         width: validWidth,
         height: validHeight
       })
-      .toFormat(format, { quality })
+      .toFormat(format, formatOptions)
       .toBuffer();
-    
+
     return {
       success: true,
       buffer: croppedBuffer,
+      format: format,
+      extension: extension,
+      mimeType: config.mimeType,
+      config: config,
       metadata: {
         original: { width: metadata.width, height: metadata.height },
         cropped: { width: validWidth, height: validHeight },
         crop_area: { x: validX, y: validY, width: validWidth, height: validHeight }
       }
     };
-    
+
   } catch (error) {
     console.error('图片裁剪失败:', error);
     return { success: false, error: error.message };
@@ -445,38 +608,73 @@ app.post('/api/crop/aesthetic', upload.single('image'), async (req, res) => {
     const requestId = uuidv4();
     console.log(`[${requestId}] 开始美学裁剪处理: ${req.file.originalname}`);
     
-    // 获取图片尺寸信息
-    const metadata = await sharp(req.file.buffer).metadata();
-    const { width: originalWidth, height: originalHeight } = metadata;
+    // 获取图片尺寸信息 - 支持BMP预处理
+    let imageBuffer = req.file.buffer;
+    let preprocessed = false;
+    let analysisMimeType = req.file.mimetype;
+
+    try {
+      // 尝试直接使用Sharp获取metadata
+      const metadata = await sharp(imageBuffer).metadata();
+      var { width: originalWidth, height: originalHeight } = metadata;
+    } catch (sharpError) {
+      // 如果Sharp失败且是BMP格式，使用Canvas预处理
+      const fileExtension = path.extname(req.file.originalname).toLowerCase();
+      const isBMP = fileExtension === '.bmp' || req.file.mimetype === 'image/bmp';
+
+      if (isBMP) {
+        console.log('Sharp无法处理BMP格式，尝试Canvas预处理...');
+        const bmpResult = await preprocessBMP(req.file.buffer);
+        imageBuffer = bmpResult.buffer;
+        preprocessed = true;
+        analysisMimeType = 'image/png';
+
+        // 使用预处理后的PNG获取metadata
+        const metadata = await sharp(imageBuffer).metadata();
+        var { width: originalWidth, height: originalHeight } = metadata;
+        console.log(`BMP预处理成功 - 图片尺寸: ${originalWidth}×${originalHeight}`);
+      } else {
+        // 非BMP格式的Sharp错误，直接抛出
+        throw sharpError;
+      }
+    }
     
     // 转换为Base64供GPT分析
-    const imageBase64 = req.file.buffer.toString('base64');
-    
+    const analysisBuffer = preprocessed ? imageBuffer : req.file.buffer;
+    const imageBase64 = analysisBuffer.toString('base64');
+
     // 获取语言参数
     const language = req.body.language || 'zh'; // 默认中文
 
     // 调用GPT-4.1 Vision进行美学分析
-    const analysisResult = await callGPTVisionAPI(imageBase64, originalWidth, originalHeight, 'aesthetic', language);
-    
-    // 执行智能裁剪 (默认PNG格式，保持原图质量)
-    const cropResult = await performSmartCrop(
-      req.file.buffer, 
-      analysisResult.crop_params,
-      'png',
-      95
+    const analysisResult = await callGPTVisionAPI(
+      imageBase64,
+      originalWidth,
+      originalHeight,
+      'aesthetic',
+      language,
+      analysisMimeType
     );
     
+    // 执行智能裁剪 (保持原图格式)
+    const cropResult = await performSmartCrop(
+      imageBuffer,
+      analysisResult.crop_params,
+      req.file.originalname,
+      req.file.mimetype
+    );
+
     if (!cropResult.success) {
       return res.status(500).json({ error: `裁剪失败: ${cropResult.error}` });
     }
-    
-    // 保存结果文件
-    const outputFileName = `aesthetic_${requestId}.png`;
+
+    // 保存结果文件（使用原始格式扩展名）
+    const outputFileName = `aesthetic_${requestId}.${cropResult.extension}`;
     const outputPath = path.join(OUTPUT_DIR, outputFileName);
     await fs.writeFile(outputPath, cropResult.buffer);
-    
-    console.log(`[${requestId}] 美学裁剪完成`);
-    
+
+    console.log(`[${requestId}] 美学裁剪完成 - 格式: ${cropResult.format}`);
+
     res.json({
       success: true,
       request_id: requestId,
@@ -487,8 +685,10 @@ app.post('/api/crop/aesthetic', upload.single('image'), async (req, res) => {
       output: {
         filename: outputFileName,
         download_url: `/api/download/${outputFileName}`,
-        format: 'png',
-        quality: 95
+        format: cropResult.format,
+        extension: cropResult.extension,
+        mimeType: cropResult.mimeType,
+        quality: cropResult.config.quality
       }
     });
     
@@ -508,6 +708,7 @@ app.post('/api/crop/batch-aesthetic', upload.array('images', 20), async (req, re
     const batchId = uuidv4();
     console.log(`[${batchId}] 开始批量美学裁剪: ${req.files.length}张图片`);
     
+    const language = req.body.language || 'zh';
     const results = [];
     
     for (let i = 0; i < req.files.length; i++) {
@@ -515,27 +716,62 @@ app.post('/api/crop/batch-aesthetic', upload.array('images', 20), async (req, re
       const requestId = `${batchId}_${i + 1}`;
       
       try {
-        // 获取图片尺寸信息
-        const metadata = await sharp(file.buffer).metadata();
-        const { width: originalWidth, height: originalHeight } = metadata;
+        // 获取图片尺寸信息 - 支持BMP预处理
+        let imageBuffer = file.buffer;
+        let preprocessed = false;
+        let analysisMimeType = file.mimetype;
+
+        try {
+          // 尝试直接使用Sharp获取metadata
+          const metadata = await sharp(imageBuffer).metadata();
+          var { width: originalWidth, height: originalHeight } = metadata;
+        } catch (sharpError) {
+          // 如果Sharp失败且是BMP格式，使用Canvas预处理
+          const fileExtension = path.extname(file.originalname).toLowerCase();
+          const isBMP = fileExtension === '.bmp' || file.mimetype === 'image/bmp';
+
+          if (isBMP) {
+            console.log(`[${requestId}] Sharp无法处理BMP格式，尝试Canvas预处理...`);
+            const bmpResult = await preprocessBMP(file.buffer);
+            imageBuffer = bmpResult.buffer;
+            preprocessed = true;
+            analysisMimeType = 'image/png';
+
+            // 使用预处理后的PNG获取metadata
+            const metadata = await sharp(imageBuffer).metadata();
+            var { width: originalWidth, height: originalHeight } = metadata;
+            console.log(`[${requestId}] BMP预处理成功 - 图片尺寸: ${originalWidth}×${originalHeight}`);
+          } else {
+            // 非BMP格式的Sharp错误，直接抛出
+            throw sharpError;
+          }
+        }
         
         // GPT美学分析
-        const imageBase64 = file.buffer.toString('base64');
-        const analysisResult = await callGPTVisionAPI(imageBase64, originalWidth, originalHeight, 'aesthetic');
-        
-        // 执行裁剪
-        const cropResult = await performSmartCrop(
-          file.buffer, 
-          analysisResult.crop_params,
-          'png',
-          95
+        const analysisBuffer = preprocessed ? imageBuffer : file.buffer;
+        const imageBase64 = analysisBuffer.toString('base64');
+        const analysisResult = await callGPTVisionAPI(
+          imageBase64,
+          originalWidth,
+          originalHeight,
+          'aesthetic',
+          language,
+          analysisMimeType
         );
         
+        // 执行裁剪 (保持原格式)
+        const cropResult = await performSmartCrop(
+          imageBuffer,
+          analysisResult.crop_params,
+          file.originalname,
+          file.mimetype
+        );
+
         if (cropResult.success) {
-          const outputFileName = `batch_aesthetic_${requestId}.png`;
+          const outputFileName = `batch_aesthetic_${requestId}.${cropResult.extension}`;
           const outputPath = path.join(OUTPUT_DIR, outputFileName);
           await fs.writeFile(outputPath, cropResult.buffer);
-          
+
           results.push({
             success: true,
             original_filename: file.originalname,
@@ -545,7 +781,10 @@ app.post('/api/crop/batch-aesthetic', upload.array('images', 20), async (req, re
             metadata: cropResult.metadata,
             output: {
               filename: outputFileName,
-              download_url: `/api/download/${outputFileName}`
+              download_url: `/api/download/${outputFileName}`,
+              format: cropResult.format,
+              extension: cropResult.extension,
+              mimeType: cropResult.mimeType
             }
           });
         } else {
@@ -648,10 +887,34 @@ app.post('/api/analyze-debug', upload.single('image'), async (req, res) => {
     console.log(`[调试模式] 使用模型: ${model}`);
     console.log(`[调试模式] 提示词长度: ${prompt.length} 字符`);
 
-    // 获取图片信息
-    const imageBuffer = req.file.buffer;
-    const imageMetadata = await sharp(imageBuffer).metadata();
-    const { width: originalWidth, height: originalHeight } = imageMetadata;
+    // 获取图片信息 - 支持BMP预处理
+    let imageBuffer = req.file.buffer;
+    let preprocessed = false;
+
+    try {
+      // 尝试直接使用Sharp获取metadata
+      const imageMetadata = await sharp(imageBuffer).metadata();
+      var { width: originalWidth, height: originalHeight } = imageMetadata;
+    } catch (sharpError) {
+      // 如果Sharp失败且是BMP格式，使用Canvas预处理
+      const fileExtension = path.extname(req.file.originalname).toLowerCase();
+      const isBMP = fileExtension === '.bmp' || req.file.mimetype === 'image/bmp';
+
+      if (isBMP) {
+        console.log('[调试模式] Sharp无法处理BMP格式，尝试Canvas预处理...');
+        const bmpResult = await preprocessBMP(req.file.buffer);
+        imageBuffer = bmpResult.buffer;
+        preprocessed = true;
+
+        // 使用预处理后的PNG获取metadata
+        const imageMetadata = await sharp(imageBuffer).metadata();
+        var { width: originalWidth, height: originalHeight } = imageMetadata;
+        console.log(`[调试模式] BMP预处理成功 - 图片尺寸: ${originalWidth}×${originalHeight}`);
+      } else {
+        // 非BMP格式的Sharp错误，直接抛出
+        throw sharpError;
+      }
+    }
     
     console.log(`[调试模式] 图片尺寸: ${originalWidth}×${originalHeight}`);
 

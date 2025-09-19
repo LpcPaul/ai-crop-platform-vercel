@@ -45,7 +45,7 @@ export function isNoNeedProcess(request: NextRequest): boolean {
   return noNeedProcessRoute.some((route) => new RegExp(route).test(pathname));
 }
 
-function addSecurityHeaders(response: NextResponse, locale?: string): NextResponse {
+function addSecurityHeaders(response: NextResponse, locale?: string, pathname?: string): NextResponse {
   // Security Headers
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
@@ -59,6 +59,9 @@ function addSecurityHeaders(response: NextResponse, locale?: string): NextRespon
   // Add Content-Language header if locale is provided
   if (locale) {
     response.headers.set('Content-Language', locale);
+    if (pathname) {
+      response.headers.set('x-pathname', pathname);
+    }
   }
 
   // Content Security Policy
@@ -161,13 +164,13 @@ export const middleware = clerkMiddleware(async (auth, req: NextRequest) => {
 
   if (isNoNeedProcess(req)) {
     const response = NextResponse.next();
-    return addSecurityHeaders(response, locale);
+    return addSecurityHeaders(response, locale, req.nextUrl.pathname);
   }
 
   const isWebhooksRoute = req.nextUrl.pathname.startsWith("/api/webhooks/");
   if (isWebhooksRoute) {
     const response = NextResponse.next();
-    return addSecurityHeaders(response, locale);
+    return addSecurityHeaders(response, locale, req.nextUrl.pathname);
   }
   const pathname = req.nextUrl.pathname;
   // Check if there is any supported locale in the pathname
@@ -209,20 +212,20 @@ export const middleware = clerkMiddleware(async (auth, req: NextRequest) => {
   const isAuthRoute = req.nextUrl.pathname.startsWith("/api/trpc/");
   if (isAuthRoute && isAuth) {
     const response = NextResponse.next();
-    return addSecurityHeaders(response, locale);
+    return addSecurityHeaders(response, locale, req.nextUrl.pathname);
   }
   if (req.nextUrl.pathname.startsWith("/admin/dashboard")) {
     if (!isAuth || !isAdmin) {
       const redirectResponse = NextResponse.redirect(new URL(`/admin/login`, req.url));
-      return addSecurityHeaders(redirectResponse);
+      return addSecurityHeaders(redirectResponse, undefined, req.nextUrl.pathname);
     }
     const response = NextResponse.next();
-    return addSecurityHeaders(response, locale);
+    return addSecurityHeaders(response, locale, req.nextUrl.pathname);
   }
   if (isAuthPage) {
     if (isAuth) {
       const redirectResponse = NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url));
-      return addSecurityHeaders(redirectResponse, locale);
+      return addSecurityHeaders(redirectResponse, locale, req.nextUrl.pathname);
     }
     return null;
   }
@@ -234,6 +237,6 @@ export const middleware = clerkMiddleware(async (auth, req: NextRequest) => {
     const redirectResponse = NextResponse.redirect(
       new URL(`/${locale}/login-clerk?from=${encodeURIComponent(from)}`, req.url),
     );
-    return addSecurityHeaders(redirectResponse, locale);
+    return addSecurityHeaders(redirectResponse, locale, req.nextUrl.pathname);
   }
 })

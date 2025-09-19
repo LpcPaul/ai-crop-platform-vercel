@@ -190,7 +190,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-      const response = await fetch('http://localhost:3002/api/analyze-debug', {
+      const response = await fetch('/api/crop/analyze', {
         method: 'POST',
         body: formData,
         signal: controller.signal,
@@ -247,7 +247,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
-      const response = await fetch('http://localhost:3002/api/crop/aesthetic', {
+      const response = await fetch('/api/crop', {
         method: 'POST',
         body: formData,
         signal: controller.signal,
@@ -575,7 +575,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                           style={getContainerStyle(croppedImageDimensions, !showOriginalLarge).style}
                         >
                           <img
-                            src={`http://localhost:3002${cropResult.output.download_url}`}
+                            src={`/api/download${cropResult.output.download_url.split('/api/download')[1]}`}
                             alt="裁剪后图片"
                             draggable={false}
                             className={
@@ -626,7 +626,7 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                       </Button>
                       {cropResult.output?.download_url && (
                         <Button
-                          onClick={() => window.open(`http://localhost:3002${cropResult.output.download_url}`, '_blank')}
+                          onClick={() => window.open(`/api/download${cropResult.output.download_url.split('/api/download')[1]}`, '_blank')}
                           className="bg-[#FF6B4A] hover:bg-[#E85E43] text-white text-sm font-medium shadow-sm"
                           size="sm"
                         >
@@ -684,12 +684,6 @@ export function ClientIndexPage({ dict, lang }: ClientIndexPageProps) {
                       </div>
                     </>
                   )}
-                  <div className="flex justify-between">
-                    <span className="text-[#6B7280] dark:text-gray-400">{dict.crop?.data_source || "数据源"}:</span>
-                    <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      🤖 {dict.crop?.ai_model || "AI模型"}
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>

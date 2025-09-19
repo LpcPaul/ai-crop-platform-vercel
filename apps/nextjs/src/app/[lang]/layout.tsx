@@ -1,14 +1,12 @@
-import "~/styles/globals.css";
-
 import { NextDevtoolsProvider } from "@next-devtools/core";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-import { cn } from "@saasfly/ui";
 import { Toaster } from "@saasfly/ui/toaster";
 
 import { TailwindIndicator } from "~/components/tailwind-indicator";
 import { ThemeProvider } from "~/components/theme-provider";
+import { LangUpdater } from "~/components/lang-updater";
 import { i18n } from "~/config/i18n-config";
 import { siteConfig } from "~/config/site";
 
@@ -79,25 +77,19 @@ export default function LangLayout({
   const currentLang = validLanguages.includes(lang) ? lang : 'en';
 
   return (
-    <html lang={currentLang} suppressHydrationWarning>
-      <head />
-      <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-        )}
+    <div data-lang={currentLang} className="h-full">
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem={false}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-        >
-          <NextDevtoolsProvider>{children}</NextDevtoolsProvider>
-          <Analytics />
-          <SpeedInsights />
-          <Toaster />
-          <TailwindIndicator />
-        </ThemeProvider>
-      </body>
-    </html>
+        <LangUpdater />
+        <NextDevtoolsProvider>{children}</NextDevtoolsProvider>
+        <Analytics />
+        <SpeedInsights />
+        <Toaster />
+        <TailwindIndicator />
+      </ThemeProvider>
+    </div>
   );
 }

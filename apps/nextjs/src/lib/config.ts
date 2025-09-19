@@ -9,14 +9,14 @@ export const config = {
 
   // Crop Service Configuration
   cropService: {
-    url: process.env.CROP_SERVICE_URL || 'http://localhost:3001',
+    url: process.env.CROP_SERVICE_URL || 'http://localhost:3002',
     timeout: parseInt(process.env.CROP_SERVICE_TIMEOUT || '60000'),
   },
 
   // Image Processing
   image: {
     maxSize: parseInt(process.env.MAX_IMAGE_SIZE || '52428800'), // 50MB
-    allowedTypes: (process.env.ALLOWED_IMAGE_TYPES || 'image/jpeg,image/png,image/gif,image/webp').split(','),
+    allowedTypes: (process.env.ALLOWED_IMAGE_TYPES || 'image/jpeg,image/png,image/gif,image/webp,image/avif,image/heic,image/heif,image/bmp,image/tiff').split(','),
   },
 
   // Cache Configuration
@@ -36,7 +36,10 @@ export const config = {
 
   // Security
   security: {
-    corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:3000').split(','),
+    corsOrigins: (process.env.CORS_ORIGINS || 'http://localhost:3000')
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean),
     jwtSecret: process.env.JWT_SECRET || 'default-secret',
     enableIpWhitelist: process.env.ENABLE_IP_WHITELIST === 'true',
     ipWhitelist: (process.env.IP_WHITELIST || '').split(',').filter(Boolean),
