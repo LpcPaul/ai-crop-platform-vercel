@@ -6,6 +6,7 @@ import { ImageProcessor } from '~/lib/utils/image';
 import { getCachedResult, cacheResult } from '~/lib/utils/cache';
 import { SecurityValidator } from '~/lib/utils/security';
 import { consumeRateLimit } from '~/lib/utils/rate-limit';
+import { checkDailyUsage } from '~/lib/utils/daily-usage-limiter';
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
@@ -17,6 +18,26 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-real-ip') ||
       'unknown';
 
+    // Check daily usage limit first
+    const dailyUsage = await checkDailyUsage(clientIp, false);
+    if (!dailyUsage.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Daily limit exceeded',
+          message: `今天的${config.dailyLimit.maxRequests}次免费裁剪已用完，明天00:00重置`,
+          messageEn: `Daily limit of ${config.dailyLimit.maxRequests} free crops exceeded. Resets at 00:00 tomorrow.`,
+          dailyUsage: {
+            used: dailyUsage.used,
+            limit: dailyUsage.limit,
+            remaining: dailyUsage.remaining,
+            resetTime: dailyUsage.resetTime,
+          },
+        },
+        { status: 429 },
+      );
+    }
+
+    // Check rate limiting
     const limitCheck = await consumeRateLimit(
       `crop:${clientIp}`,
       config.rateLimit.max,
@@ -64,6 +85,8 @@ export async function POST(request: NextRequest) {
 
       const cachedResult = await getCachedResult(formatAwareCacheKey);
       if (cachedResult) {
+        // Cache hit - don't consume daily usage, but include usage info in response
+        const currentUsage = await checkDailyUsage(clientIp, false);
         SecurityValidator.logSecurityEvent('cache_hit', {
           imageHash,
           formatAwareCacheKey,
@@ -73,8 +96,34 @@ export async function POST(request: NextRequest) {
           ...cachedResult,
           cached: true,
           processingTime: Date.now() - startTime,
+          dailyUsage: {
+            used: currentUsage.used,
+            limit: currentUsage.limit,
+            remaining: currentUsage.remaining,
+            resetTime: currentUsage.resetTime,
+            shouldWarn: currentUsage.shouldWarn,
+          },
         });
       }
+    }
+
+    // Consume daily usage before making actual AI call
+    const updatedDailyUsage = await checkDailyUsage(clientIp, true);
+    if (!updatedDailyUsage.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Daily limit exceeded',
+          message: `今天的${config.dailyLimit.maxRequests}次免费裁剪已用完，明天00:00重置`,
+          messageEn: `Daily limit of ${config.dailyLimit.maxRequests} free crops exceeded. Resets at 00:00 tomorrow.`,
+          dailyUsage: {
+            used: updatedDailyUsage.used,
+            limit: updatedDailyUsage.limit,
+            remaining: updatedDailyUsage.remaining,
+            resetTime: updatedDailyUsage.resetTime,
+          },
+        },
+        { status: 429 },
+      );
     }
 
     const cropServiceFormData = new FormData();
@@ -119,6 +168,13 @@ export async function POST(request: NextRequest) {
         processingTime: Date.now() - startTime,
         timestamp: new Date().toISOString(),
         cached: false,
+        dailyUsage: {
+          used: updatedDailyUsage.used,
+          limit: updatedDailyUsage.limit,
+          remaining: updatedDailyUsage.remaining,
+          resetTime: updatedDailyUsage.resetTime,
+          shouldWarn: updatedDailyUsage.shouldWarn,
+        },
       };
 
       if (config.performance.enableDedupCache && formatAwareCacheKey) {

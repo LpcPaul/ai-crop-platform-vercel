@@ -48,7 +48,7 @@ export function LocaleChange({ url }: { url: string }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="h-8 w-8 px-0" disabled={isChanging}>
           {isChanging ? (
-            <Icons.Loader2 className="h-4 w-4 animate-spin" />
+            <Icons.Spinner className="h-4 w-4 animate-spin" />
           ) : (
             <Icons.Languages />
           )}

@@ -1,3 +1,18 @@
+// Environment validation helper
+function validateRequiredEnvVar(name: string, value: string | undefined): string {
+  if (!value || value.trim() === '' || value === 'your_jwt_secret_here' || value === 'your_openai_api_key_here') {
+    throw new Error(`Required environment variable ${name} is not set or uses placeholder value`);
+  }
+  return value;
+}
+
+// Validate critical environment variables in production
+if (process.env.NODE_ENV === 'production') {
+  validateRequiredEnvVar('CROP_SERVICE_URL', process.env.CROP_SERVICE_URL);
+  validateRequiredEnvVar('JWT_SECRET', process.env.JWT_SECRET);
+  // validateRequiredEnvVar('OPENAI_API_KEY', process.env.OPENAI_API_KEY); // Uncomment when OpenAI is required
+}
+
 export const config = {
   // AI API Configuration
   openai: {
@@ -9,7 +24,7 @@ export const config = {
 
   // Crop Service Configuration
   cropService: {
-    url: process.env.CROP_SERVICE_URL || 'http://localhost:3002',
+    url: process.env.CROP_SERVICE_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3002'),
     timeout: parseInt(process.env.CROP_SERVICE_TIMEOUT || '60000'),
   },
 
@@ -40,7 +55,7 @@ export const config = {
       .split(',')
       .map((origin) => origin.trim())
       .filter(Boolean),
-    jwtSecret: process.env.JWT_SECRET || 'default-secret',
+    jwtSecret: process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'development-secret'),
     enableIpWhitelist: process.env.ENABLE_IP_WHITELIST === 'true',
     ipWhitelist: (process.env.IP_WHITELIST || '').split(',').filter(Boolean),
   },
@@ -58,5 +73,12 @@ export const config = {
     enableDedupCache: process.env.ENABLE_DEDUP_CACHE === 'true',
     enableImageOptimization: process.env.ENABLE_IMAGE_OPTIMIZATION === 'true',
     maxConcurrentRequests: parseInt(process.env.MAX_CONCURRENT_REQUESTS || '10'),
+  },
+
+  // Daily Usage Limits
+  dailyLimit: {
+    maxRequests: parseInt(process.env.DAILY_USAGE_LIMIT || '30'),
+    warningThreshold: parseInt(process.env.DAILY_WARNING_THRESHOLD || '3'),
+    resetHour: parseInt(process.env.DAILY_RESET_HOUR || '0'), // UTC hour for daily reset
   },
 };

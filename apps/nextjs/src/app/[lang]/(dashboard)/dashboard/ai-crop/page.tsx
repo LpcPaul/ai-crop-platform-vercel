@@ -490,7 +490,7 @@ export default function AICropPage() {
                   const files = e.dataTransfer.files;
                   if (files.length > 0) {
                     const file = files[0];
-                    if (file.type.startsWith('image/')) {
+                    if (file && file.type.startsWith('image/')) {
                       if (file.size > 50 * 1024 * 1024) {
                         showError("图片大小不能超过50MB");
                         return;

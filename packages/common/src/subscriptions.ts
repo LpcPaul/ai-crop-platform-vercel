@@ -58,10 +58,8 @@ export const pricingData: SubscriptionPlan[] = [
       yearly: 144,
     },
     stripeIds: {
-      // @ts-ignore
       monthly: env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID,
-      // @ts-ignore
-      yearly: env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID,
+      yearly: env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID,
     },
   },
   {
@@ -80,9 +78,7 @@ export const pricingData: SubscriptionPlan[] = [
       yearly: 300,
     },
     stripeIds: {
-      // @ts-ignore
-      monthly: env.NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID,
-      // @ts-ignore
+      monthly: env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID,
       yearly: env.NEXT_PUBLIC_STRIPE_BUSINESS_YEARLY_PRICE_ID,
     },
   },

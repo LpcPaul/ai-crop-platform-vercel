@@ -30,7 +30,7 @@ const config = {
   images: {
     domains: ["images.unsplash.com", "avatars.githubusercontent.com", "www.twillot.com", "cdnv2.ruguoapp.com", "www.setupyourpay.com"],
   },
-  /** We already do linting and typechecking as separate tasks in CI */
+  /** Temporarily disable checks for initial deployment - should be re-enabled after fixing type issues */
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
   output: "standalone",

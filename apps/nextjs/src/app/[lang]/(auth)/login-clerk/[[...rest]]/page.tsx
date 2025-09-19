@@ -35,7 +35,7 @@ export default async function LoginPage({
       >
         <>
           <Icons.ChevronLeft className="mr-2 h-4 w-4" />
-          {dict.login.back}
+          {(dict.login as any).back || "返回"}
         </>
       </Link>
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
@@ -48,10 +48,10 @@ export default async function LoginPage({
             alt=""
           />
           <h1 className="text-2xl font-semibold tracking-tight">
-            {dict.login.welcome_back}
+            {(dict.login as any).welcome_back || "欢迎回来"}
           </h1>
         </div>
-        <UserClerkAuthForm lang={lang} dict={dict.login} />
+        <UserClerkAuthForm lang={lang} dict={dict.login as any} />
       </div>
     </div>
   );
