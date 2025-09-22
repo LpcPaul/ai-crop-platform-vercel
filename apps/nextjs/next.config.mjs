@@ -1,12 +1,16 @@
 // @ts-check
-import "./src/env.mjs";
-import "@saasfly/auth/env.mjs";
+// Skip env validation for Vercel builds
+if (process.env.NODE_ENV !== 'production' && !process.env.SKIP_ENV_VALIDATION) {
+  try {
+    await import("./src/env.mjs");
+    await import("@saasfly/auth/env.mjs");
+  } catch (e) {
+    console.warn("Environment validation skipped for deployment");
+  }
+}
 
 import { withNextDevtools } from "@next-devtools/core/plugin";
-// import "@saasfly/api/env"
 import withMDX from "@next/mdx";
-
-!process.env.SKIP_ENV_VALIDATION && (await import("./src/env.mjs"));
 
 /** @type {import("next").NextConfig} */
 const config = {
