@@ -2499,6 +2499,7 @@
 ./apps/nextjs/.clerk/.tmp
 ./apps/nextjs/.clerk/.tmp/keyless.json
 ./apps/nextjs/.clerk/.tmp/README.md
+./apps/nextjs/.env.production
 ./apps/nextjs/.DS_Store
 ./apps/nextjs/vercel.json
 ./apps/nextjs/contentlayer.config.ts
