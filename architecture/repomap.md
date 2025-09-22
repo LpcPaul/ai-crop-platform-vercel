@@ -1261,6 +1261,10 @@
 ./apps/nextjs/.contentlayer/generated/index.d.ts
 ./apps/nextjs/.contentlayer/package.json
 ./apps/nextjs/.contentlayer/.cache
+./apps/nextjs/.contentlayer/.cache/v0.5.8
+./apps/nextjs/.contentlayer/.cache/v0.5.8/compiled-contentlayer-config-5DKXTCBT.mjs
+./apps/nextjs/.contentlayer/.cache/v0.5.8/compiled-contentlayer-config-5DKXTCBT.mjs.map
+./apps/nextjs/.contentlayer/.cache/v0.5.8/data-5DKXTCBT.json
 ./apps/nextjs/.contentlayer/.cache/v0.4.3
 ./apps/nextjs/.contentlayer/.cache/v0.4.3/compiled-contentlayer-config-5DKXTCBT.mjs
 ./apps/nextjs/.contentlayer/.cache/v0.4.3/compiled-contentlayer-config-5DKXTCBT.mjs.map
