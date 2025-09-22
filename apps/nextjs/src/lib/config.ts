@@ -24,7 +24,7 @@ export const config = {
 
   // Crop Service Configuration
   cropService: {
-    url: process.env.CROP_SERVICE_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3002'),
+    url: process.env.CROP_SERVICE_URL || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001'),
     timeout: parseInt(process.env.CROP_SERVICE_TIMEOUT || '60000'),
   },
 
