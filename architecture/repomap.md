@@ -78,6 +78,7 @@
 ./scripts
 ./scripts/install-hooks.sh
 ./scripts/update-repomap.sh
+./scripts/prepare-vercel-deploy.sh
 ./packages
 ./packages/ui
 ./packages/ui/tailwind.config.ts
@@ -2500,12 +2501,14 @@
 ./apps/nextjs/.clerk/.tmp/keyless.json
 ./apps/nextjs/.clerk/.tmp/README.md
 ./apps/nextjs/.env.production
+./apps/nextjs/install-for-vercel.sh
 ./apps/nextjs/.DS_Store
 ./apps/nextjs/vercel.json
 ./apps/nextjs/contentlayer.config.ts
 ./apps/nextjs/next.config.mjs
 ./apps/nextjs/next.config.js
 ./apps/nextjs/postcss.config.cjs
+./apps/nextjs/package.vercel.json
 ./apps/nextjs/.next
 ./apps/nextjs/.next/types
 ./apps/nextjs/.next/types/app
@@ -3009,6 +3012,7 @@
 ./apps/nextjs/public/favicon-32x32.png
 ./apps/nextjs/.gitignore
 ./apps/nextjs/package.json
+./apps/nextjs/package.json.backup
 ./apps/nextjs/tsconfig.json
 ./apps/nextjs/.eslintignore
 ./apps/nextjs/.eslintrc.json

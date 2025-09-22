@@ -6,15 +6,20 @@
     "build": "SKIP_ENV_VALIDATION=true next build",
     "build:vercel": "SKIP_ENV_VALIDATION=true next build",
     "clean": "git clean -xdf .next .turbo node_modules",
-    "dev": "next dev",
-    "lint": "next lint --quiet",
-    "format": "prettier --write '**/*.{js,cjs,mjs,ts,tsx,md,json}' --ignore-path .prettierignore",
-    "start": "next start"
+    "dev": "bun with-env next dev",
+    "lint": " bun with-env next lint --quiet",
+    "format": "prettier --write '**/*.{js,cjs,mjs,ts,tsx,md,json}'  --ignore-path .prettierignore",
+    "start": "bun with-env next start",
+    "with-env": "dotenv -e ../../.env.local --"
   },
   "dependencies": {
     "@dinero.js/currencies": "2.0.0-alpha.14",
     "@formatjs/intl-localematcher": "0.5.4",
     "@hookform/resolvers": "3.3.4",
+    "@saasfly/api": "workspace:*",
+    "@saasfly/auth": "workspace:*",
+    "@saasfly/db": "workspace:*",
+    "@saasfly/stripe": "workspace:*",
     "@t3-oss/env-nextjs": "0.8.0",
     "@tanstack/react-query": "5.36.0",
     "@tanstack/react-query-devtools": "5.36.0",
@@ -48,6 +53,10 @@
     "ioredis": "^5.4.1"
   },
   "devDependencies": {
+    "@saasfly/eslint-config": "workspace:*",
+    "@saasfly/prettier-config": "workspace:*",
+    "@saasfly/tailwind-config": "workspace:*",
+    "@saasfly/typescript-config": "workspace:*",
     "@types/negotiator": "0.6.3",
     "@types/node": "20.12.12",
     "@types/react": "18.3.3",
@@ -59,5 +68,14 @@
     "tailwindcss": "3.4.1",
     "typescript": "5.4.5",
     "@next-devtools/core": "0.2.0"
-  }
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@saasfly/eslint-config/base",
+      "@saasfly/eslint-config/nextjs",
+      "@saasfly/eslint-config/react"
+    ]
+  },
+  "prettier": "@saasfly/prettier-config"
 }
