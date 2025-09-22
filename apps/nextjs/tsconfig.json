@@ -1,5 +1,5 @@
 {
-  "extends": "@saasfly/typescript-config/base.json",
+  "extends": "../../tooling/typescript-config/base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -20,7 +20,8 @@
     "*.tsx",
     "*.mjs",
     "src",
-    "contentlayer.config.ts"
+    "contentlayer.config.ts",
+    "../../packages/*/src/**/*"
   ],
   "exclude": ["node_modules"]
 }

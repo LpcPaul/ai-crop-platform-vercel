@@ -1,17 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "apps/nextjs/package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/apps/nextjs/$1"
-    }
-  ],
+  "buildCommand": "pnpm turbo run build --filter=@saasfly/nextjs",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "apps/nextjs/.next",
   "github": {
     "silent": true
   }

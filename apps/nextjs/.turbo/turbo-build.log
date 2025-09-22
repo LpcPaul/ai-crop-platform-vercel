@@ -1,0 +1,366 @@
+
+> @saasfly/nextjs@0.1.0 build /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs
+> SKIP_ENV_VALIDATION=true next build
+
+  ▲ Next.js 14.2.5
+  - Environments: .env.local, .env.production
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/75) ...
+Usage status API error: q [Error]: Dynamic server usage: Route /api/usage-status couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at W (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21106)
+    at Object.get (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:28459)
+    at p (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/api/usage-status/route.js:1:1044)
+    at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:36264
+    at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+    at NoopContextManager.with (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+    at ContextAPI.with (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+    at NoopTracer.startActiveSpan (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+    at ProxyTracer.startActiveSpan (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/@opentelemetry+api@1.9.0/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+    at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+  description: "Route /api/usage-status couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[lang]/login". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:10529)
+    at s (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:21434)
+    at x (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/9687.js:1:964)
+    at nj (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+    at nB (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+    at nD (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+
+Error occurred prerendering page "/es/login". Read more: https://nextjs.org/docs/messages/prerender-error
+
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[lang]/login". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:10529)
+    at s (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:21434)
+    at x (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/9687.js:1:964)
+    at nj (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+    at nB (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+    at nD (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+
+Error occurred prerendering page "/ja/login". Read more: https://nextjs.org/docs/messages/prerender-error
+
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[lang]/login". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:10529)
+    at s (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:21434)
+    at x (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/9687.js:1:964)
+    at nj (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+    at nB (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+    at nD (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+
+Error occurred prerendering page "/zh/login". Read more: https://nextjs.org/docs/messages/prerender-error
+
+   Generating static pages (18/75) 
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[lang]/login". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:10529)
+    at s (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:21434)
+    at x (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/9687.js:1:964)
+    at nj (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+    at nB (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+    at nD (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+
+Error occurred prerendering page "/en/login". Read more: https://nextjs.org/docs/messages/prerender-error
+
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[lang]/register". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:10529)
+    at s (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:21434)
+    at x (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/9687.js:1:964)
+    at nj (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+    at nB (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+    at nD (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+
+Error occurred prerendering page "/zh/register". Read more: https://nextjs.org/docs/messages/prerender-error
+
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[lang]/register". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:10529)
+    at s (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:21434)
+    at x (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/9687.js:1:964)
+    at nj (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+    at nB (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+    at nD (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+
+Error occurred prerendering page "/ja/register". Read more: https://nextjs.org/docs/messages/prerender-error
+
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[lang]/register". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:10529)
+    at s (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:21434)
+    at x (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/9687.js:1:964)
+    at nj (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+    at nB (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+    at nD (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+
+Error occurred prerendering page "/es/register". Read more: https://nextjs.org/docs/messages/prerender-error
+
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/[lang]/register". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:10529)
+    at s (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2340.js:1:21434)
+    at x (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/9687.js:1:964)
+    at nj (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46251)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47571)
+    at nM (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:61546)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64546)
+    at nB (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67538)
+    at nD (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66680)
+    at nN (/Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64853)
+
+Error occurred prerendering page "/en/register". Read more: https://nextjs.org/docs/messages/prerender-error
+
+   Generating static pages (37/75) 
+   Generating static pages (56/75) 
+TypeError: Cannot read properties of undefined (reading 'billing')
+    at m (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:1965) {
+  digest: '4089687115'
+}
+TypeError: Cannot read properties of undefined (reading 'billing')
+    at m (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:1965) {
+  digest: '4089687115'
+}
+[97;46m << query [1;97;46m #1 auth.mySubscription [0m {
+  input: undefined,
+  result: a [TRPCClientError]: Dynamic server usage: Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+      at a.from (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:1:7087)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8227
+      at processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at runNextTicks (node:internal/process/task_queues:69:3)
+      at listOnTimeout (node:internal/timers:549:9)
+      at process.processTimers (node:internal/timers:523:7) {
+    meta: undefined,
+    shape: undefined,
+    data: undefined,
+    [cause]: n [Error]: Dynamic server usage: Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+        at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/5063.js:1:56358)
+        at f (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/4801.js:1:1757)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:7858
+        at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:185493
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8053
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:5377)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:867
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:1329 {
+      description: "Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+      digest: 'DYNAMIC_SERVER_USAGE'
+    }
+  },
+  elapsedMs: 1
+}
+[97;46m << query [1;97;46m #2 auth.mySubscription [0m {
+  input: undefined,
+  result: a [TRPCClientError]: Dynamic server usage: Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+      at a.from (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:1:7087)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8227 {
+    meta: undefined,
+    shape: undefined,
+    data: undefined,
+    [cause]: n [Error]: Dynamic server usage: Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+        at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/5063.js:1:56358)
+        at f (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/4801.js:1:1757)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:7858
+        at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:185493
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8053
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:5377)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:867
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:1329 {
+      description: "Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+      digest: 'DYNAMIC_SERVER_USAGE'
+    }
+  },
+  elapsedMs: 0
+}
+a [TRPCClientError]: Dynamic server usage: Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at a.from (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:1:7087)
+    at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8227
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at runNextTicks (node:internal/process/task_queues:69:3)
+    at listOnTimeout (node:internal/timers:549:9)
+    at process.processTimers (node:internal/timers:523:7) {
+  meta: undefined,
+  shape: undefined,
+  data: undefined,
+  digest: '632633607',
+  [cause]: n [Error]: Dynamic server usage: Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+      at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/5063.js:1:56358)
+      at f (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/4801.js:1:1757)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:7858
+      at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:185493
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8053
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:5377)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:867
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:1329 {
+    description: "Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+    digest: 'DYNAMIC_SERVER_USAGE'
+  }
+}
+a [TRPCClientError]: Dynamic server usage: Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at a.from (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:1:7087)
+    at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8227 {
+  meta: undefined,
+  shape: undefined,
+  data: undefined,
+  digest: '957650464',
+  [cause]: n [Error]: Dynamic server usage: Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+      at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/5063.js:1:56358)
+      at f (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/4801.js:1:1757)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:7858
+      at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:185493
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8053
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:5377)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:867
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:1329 {
+    description: "Route /zh/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+    digest: 'DYNAMIC_SERVER_USAGE'
+  }
+}
+[97;46m << query [1;97;46m #1 auth.mySubscription [0m {
+  input: undefined,
+  result: a [TRPCClientError]: Dynamic server usage: Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+      at a.from (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:1:7087)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8227 {
+    meta: undefined,
+    shape: undefined,
+    data: undefined,
+    [cause]: n [Error]: Dynamic server usage: Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+        at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/5063.js:1:56358)
+        at f (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/4801.js:1:1757)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:7858
+        at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:185493
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8053
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:5377)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:867
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:1329 {
+      description: "Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+      digest: 'DYNAMIC_SERVER_USAGE'
+    }
+  },
+  elapsedMs: 1
+}
+[97;46m << query [1;97;46m #2 auth.mySubscription [0m {
+  input: undefined,
+  result: a [TRPCClientError]: Dynamic server usage: Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+      at a.from (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:1:7087)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8227 {
+    meta: undefined,
+    shape: undefined,
+    data: undefined,
+    [cause]: n [Error]: Dynamic server usage: Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+        at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/5063.js:1:56358)
+        at f (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/4801.js:1:1757)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:7858
+        at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:185493
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8053
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:5377)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:867
+        at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+        at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:1329 {
+      description: "Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+      digest: 'DYNAMIC_SERVER_USAGE'
+    }
+  },
+  elapsedMs: 0
+}
+a [TRPCClientError]: Dynamic server usage: Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at a.from (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:1:7087)
+    at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8227 {
+  meta: undefined,
+  shape: undefined,
+  data: undefined,
+  digest: '883801664',
+  [cause]: n [Error]: Dynamic server usage: Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+      at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/5063.js:1:56358)
+      at f (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/4801.js:1:1757)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:7858
+      at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:185493
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8053
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:5377)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:867
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:1329 {
+    description: "Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+    digest: 'DYNAMIC_SERVER_USAGE'
+  }
+}
+a [TRPCClientError]: Dynamic server usage: Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at a.from (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:1:7087)
+    at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8227 {
+  meta: undefined,
+  shape: undefined,
+  data: undefined,
+  digest: '883801664',
+  [cause]: n [Error]: Dynamic server usage: Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+      at l (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/5063.js:1:56358)
+      at f (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/4801.js:1:1757)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:7858
+      at /Users/hujing/Desktop/code/ai-crop-versel/node_modules/.pnpm/next@14.2.5_@babel+core@7.28.4_@opentelemetry+api@1.9.0_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:185493
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:8053
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:5377)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:867
+      at Object.subscribe (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:4731)
+      at /Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/chunks/2738.js:5:1329 {
+    description: "Route /en/dashboard/billing couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+    digest: 'DYNAMIC_SERVER_USAGE'
+  }
+}
+TypeError: Cannot read properties of undefined (reading 'billing')
+    at m (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:1965) {
+  digest: '4089687115'
+}
+TypeError: Cannot read properties of undefined (reading 'billing')
+    at m (/Users/hujing/Desktop/code/ai-crop-versel/apps/nextjs/.next/server/app/[lang]/(dashboard)/dashboard/billing/page.js:9:1965) {
+  digest: '4089687115'
+}
+ ✓ Generating static pages (75/75)
+
+> Export encountered errors on following paths:
+	/[lang]/(auth)/login/page: /en/login
+	/[lang]/(auth)/login/page: /es/login
+	/[lang]/(auth)/login/page: /ja/login
+	/[lang]/(auth)/login/page: /zh/login
+	/[lang]/(auth)/register/page: /en/register
+	/[lang]/(auth)/register/page: /es/register
+	/[lang]/(auth)/register/page: /ja/register
+	/[lang]/(auth)/register/page: /zh/register
+ ELIFECYCLE  Command failed with exit code 1.
