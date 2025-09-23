@@ -820,8 +820,10 @@
 ./apps/nextjs/.next/cache/webpack/client-production/9.pack
 ./apps/nextjs/.next/cache/webpack/client-production/5.pack
 ./apps/nextjs/.next/cache/webpack/client-production/4.pack
+./apps/nextjs/.next/cache/webpack/client-production/14.pack
 ./apps/nextjs/.next/cache/webpack/client-production/index.pack
 ./apps/nextjs/.next/cache/webpack/client-production/8.pack
+./apps/nextjs/.next/cache/webpack/client-production/13.pack
 ./apps/nextjs/.next/cache/webpack/client-production/3.pack
 ./apps/nextjs/.next/cache/webpack/client-production/2.pack
 ./apps/nextjs/.next/cache/webpack/client-production/12.pack
@@ -848,6 +850,7 @@
 ./apps/nextjs/.next/cache/webpack/server-production/1.pack
 ./apps/nextjs/.next/cache/webpack/server-production/index.pack.old
 ./apps/nextjs/.next/cache/webpack/server-production/0.pack
+./apps/nextjs/.next/cache/webpack/server-production/6.pack
 ./apps/nextjs/.next/cache/eslint
 ./apps/nextjs/.next/cache/eslint/.cache_n4ldv6
 ./apps/nextjs/.next/cache/.tsbuildinfo
@@ -1163,9 +1166,6 @@
 ./apps/nextjs/.next/static/css
 ./apps/nextjs/.next/static/css/bba7de5763941935.css
 ./apps/nextjs/.next/static/css/4375d40646e84962.css
-./apps/nextjs/.next/static/8QXTZb46vahxldYOnWPcx
-./apps/nextjs/.next/static/8QXTZb46vahxldYOnWPcx/_ssgManifest.js
-./apps/nextjs/.next/static/8QXTZb46vahxldYOnWPcx/_buildManifest.js
 ./apps/nextjs/.next/static/chunks
 ./apps/nextjs/.next/static/chunks/2173-e470c3a106b115ed.js
 ./apps/nextjs/.next/static/chunks/framework-8f0792a07c308ff1.js
@@ -1257,6 +1257,9 @@
 ./apps/nextjs/.next/static/chunks/5741-dbb79c39dbc53b02.js
 ./apps/nextjs/.next/static/chunks/8761-fb0612d430056442.js
 ./apps/nextjs/.next/static/chunks/7039-5a7f51d3bae7dbee.js
+./apps/nextjs/.next/static/zfMuTJcVEaf4tdkBJx-B1
+./apps/nextjs/.next/static/zfMuTJcVEaf4tdkBJx-B1/_ssgManifest.js
+./apps/nextjs/.next/static/zfMuTJcVEaf4tdkBJx-B1/_buildManifest.js
 ./apps/nextjs/.next/prerender-manifest.json
 ./apps/nextjs/.next/routes-manifest.json
 ./apps/nextjs/.next/app-path-routes-manifest.json

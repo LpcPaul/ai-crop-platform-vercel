@@ -7,6 +7,9 @@ import { db } from "@saasfly/db";
 import { ClusterConfig } from "~/components/k8s/cluster-config";
 import type { Cluster } from "~/types/k8s";
 
+// Force dynamic rendering for this page to avoid build-time database queries
+export const dynamic = 'force-dynamic';
+
 async function getClusterForUser(clusterId: Cluster["id"], userId: User["id"]) {
   return await db
     .selectFrom("K8sClusterConfig")
