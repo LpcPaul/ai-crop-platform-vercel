@@ -13,9 +13,11 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: z.string().min(1).optional(), // Added and made optional for v1.0 launch
     STRIPE_API_KEY: z.string().min(1).optional(), // Made optional for v1.0 launch
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(), // Made optional for v1.0 launch
+    RESEND_API_KEY: z.string().min(1).optional(), // Made optional for AI crop platform
+    RESEND_FROM: z.string().email().optional(), // Made optional for AI crop platform
   },
   client: {
-    NEXT_PUBLIC_APP_URL: z.string().min(1),
+    NEXT_PUBLIC_APP_URL: z.string().min(1).optional(), // Made optional for AI crop platform
     NEXT_PUBLIC_STRIPE_PRO_PRODUCT_ID: z.string().optional(),
     NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID: z.string().optional(),
     NEXT_PUBLIC_STRIPE_PRO_YEARLY_PRICE_ID: z.string().optional(),
@@ -34,6 +36,8 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     STRIPE_API_KEY: process.env.STRIPE_API_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_FROM: process.env.RESEND_FROM,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_STRIPE_PRO_PRODUCT_ID:
       process.env.NEXT_PUBLIC_STRIPE_PRO_PRODUCT_ID,
