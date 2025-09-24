@@ -50,9 +50,10 @@
     "next-contentlayer2": "^0.5.8",
     "mdast-util-toc": "^7.1.0",
     "rehype-autolink-headings": "^7.1.0",
-    "rehype-pretty-code": "^0.13.2",
+    "rehype-pretty-code": "^0.14.1",
     "rehype-slug": "^6.0.0",
-    "remark-gfm": "^4.0.0"
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@saasfly/typescript-config": "workspace:*",
