@@ -48,6 +48,10 @@
     "ioredis": "^5.4.1"
   },
   "devDependencies": {
+    "@saasfly/typescript-config": "workspace:*",
+    "@saasfly/eslint-config": "workspace:*",
+    "@saasfly/prettier-config": "workspace:*",
+    "@saasfly/tailwind-config": "workspace:*",
     "@types/negotiator": "0.6.3",
     "@types/node": "20.12.12",
     "@types/react": "18.3.3",

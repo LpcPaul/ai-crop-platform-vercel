@@ -179,6 +179,18 @@ importers:
       '@next-devtools/core':
         specifier: 0.2.0
         version: 0.2.0(@types/react@18.3.3)(bufferutil@4.0.8)(eslint@8.57.0)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@6.0.3)(webpack@5.101.3)
+      '@saasfly/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint-config
+      '@saasfly/prettier-config':
+        specifier: workspace:*
+        version: link:../../tooling/prettier-config
+      '@saasfly/tailwind-config':
+        specifier: workspace:*
+        version: link:../../tooling/tailwind-config
+      '@saasfly/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript-config
       '@types/negotiator':
         specifier: 0.6.3
         version: 0.6.3
