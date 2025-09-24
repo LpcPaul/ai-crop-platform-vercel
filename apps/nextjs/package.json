@@ -12,6 +12,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "@saasfly/api": "workspace:*",
+    "@saasfly/auth": "workspace:*",
+    "@saasfly/common": "workspace:*",
+    "@saasfly/db": "workspace:*",
+    "@saasfly/stripe": "workspace:*",
+    "@saasfly/ui": "workspace:*",
     "@dinero.js/currencies": "2.0.0-alpha.14",
     "@formatjs/intl-localematcher": "0.5.4",
     "@hookform/resolvers": "3.3.4",

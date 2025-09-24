@@ -82,6 +82,24 @@ importers:
       '@hookform/resolvers':
         specifier: 3.3.4
         version: 3.3.4(react-hook-form@7.50.1(react@18.3.1))
+      '@saasfly/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@saasfly/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
+      '@saasfly/common':
+        specifier: workspace:*
+        version: link:../../packages/common
+      '@saasfly/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@saasfly/stripe':
+        specifier: workspace:*
+        version: link:../../packages/stripe
+      '@saasfly/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@t3-oss/env-nextjs':
         specifier: 0.8.0
         version: 0.8.0(typescript@5.4.5)(zod@3.22.4)
