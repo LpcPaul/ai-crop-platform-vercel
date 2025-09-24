@@ -6,8 +6,6 @@ import { env } from "./env.mjs";
 
 export * from "./webhooks";
 
-export type { Stripe };
-
 export const stripe = new Stripe(env.STRIPE_API_KEY, {
   typescript: true,
 });
