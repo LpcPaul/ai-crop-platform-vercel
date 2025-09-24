@@ -2,6 +2,9 @@ import React from "react";
 import { redirect } from "next/navigation";
 
 import { authOptions, getCurrentUser } from "@saasfly/auth";
+
+// Force dynamic rendering to avoid build-time database queries
+export const dynamic = 'force-dynamic';
 import {
   Table,
   TableCaption,
