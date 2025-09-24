@@ -5,6 +5,9 @@ import {createTRPCContext} from "@saasfly/api";
 import {edgeRouter} from "@saasfly/api/edge";
 import {getAuth} from "@clerk/nextjs/server";
 
+// Force dynamic rendering to avoid build-time database connections
+export const dynamic = 'force-dynamic';
+
 // export const runtime = "edge";
 const createContext = async (req: NextRequest) => {
     return createTRPCContext({
