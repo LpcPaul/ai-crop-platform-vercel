@@ -2800,7 +2800,6 @@
 ./apps/nextjs/.env.local
 ./apps/nextjs/vercel.json
 ./apps/nextjs/contentlayer.config.ts
-./apps/nextjs/next.config.mjs
 ./apps/nextjs/next.config.js
 ./apps/nextjs/postcss.config.cjs
 ./apps/nextjs/node_modules
