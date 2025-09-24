@@ -13,7 +13,7 @@
     "lint": "turbo lint -- --quiet -- --cache --cache-location 'node_modules/.cache/.eslintcache' && manypkg check",
     "lint:fix": "turbo lint --continue -- --fix --cache --cache-location 'node_modules/.cache/.eslintcache' ",
     "typecheck": "turbo typecheck",
-    "postinstall": "bun run check-deps",
+    "postinstall": "pnpm check-deps",
     "check-deps": "check-dependency-version-consistency .",
     "gen": "turbo gen --config 'turbo/generators/config.ts'"
   },
@@ -34,7 +34,7 @@
     "packages/*",
     "tooling/*"
   ],
-  "packageManager": "bun@v1.1.10",
+  "packageManager": "pnpm@9.0.0",
   "dependencies": {
     "@clerk/nextjs": "^6.20.0",
     "critters": "^0.0.25"
