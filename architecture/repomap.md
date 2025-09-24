@@ -2982,6 +2982,8 @@
 ./apps/nextjs/.next/cache/webpack/server-production
 ./apps/nextjs/.next/cache/webpack/server-production/index.pack
 ./apps/nextjs/.next/cache/webpack/server-production/0.pack
+./apps/nextjs/.next/cache/eslint
+./apps/nextjs/.next/cache/eslint/.cache_n4ldv6
 ./apps/nextjs/.next/server
 ./apps/nextjs/.next/server/pages-manifest.json
 ./apps/nextjs/.next/server/server-reference-manifest.js
