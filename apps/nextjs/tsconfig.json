@@ -4,7 +4,14 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
-      "contentlayer/generated": ["./.contentlayer/generated"]
+      "contentlayer/generated": ["./.contentlayer/generated"],
+      "@saasfly/ui": ["../../packages/ui/src"],
+      "@saasfly/ui/*": ["../../packages/ui/src/*"],
+      "@saasfly/api": ["../../packages/api/src"],
+      "@saasfly/auth": ["../../packages/auth/src"],
+      "@saasfly/db": ["../../packages/db/src"],
+      "@saasfly/stripe": ["../../packages/stripe/src"],
+      "@saasfly/common": ["../../packages/common/src"]
     },
     "plugins": [
       {
