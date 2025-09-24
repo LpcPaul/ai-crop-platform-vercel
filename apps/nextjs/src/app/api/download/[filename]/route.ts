@@ -3,6 +3,9 @@ import path from "path";
 
 import { config } from "~/lib/config";
 
+// Force dynamic rendering to avoid build-time execution
+export const dynamic = 'force-dynamic';
+
 // 安全的文件名验证和清理
 function sanitizeFilename(filename: string): string | null {
   if (!filename || typeof filename !== 'string') {
