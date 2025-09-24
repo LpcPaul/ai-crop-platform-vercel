@@ -2,7 +2,6 @@
   "name": "@saasfly/tailwind-config",
   "private": true,
   "version": "0.1.0",
-  "type": "module",
   "main": "index.ts",
   "files": [
     "index.ts",
