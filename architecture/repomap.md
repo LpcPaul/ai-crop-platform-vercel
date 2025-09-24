@@ -2875,6 +2875,8 @@
 ./apps/nextjs/node_modules/tailwindcss
 ./apps/nextjs/node_modules/@dinero.js
 ./apps/nextjs/node_modules/@dinero.js/currencies
+./apps/nextjs/node_modules/.cache
+./apps/nextjs/node_modules/.cache/tsbuildinfo.json
 ./apps/nextjs/node_modules/recharts
 ./apps/nextjs/node_modules/framer-motion
 ./apps/nextjs/node_modules/react
