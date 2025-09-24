@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-// Force dynamic rendering to avoid build-time execution
-export const dynamic = 'force-dynamic';
-
 import { config } from '~/lib/config';
 import { ImageProcessor } from '~/lib/utils/image';
 import { getCachedResult, cacheResult } from '~/lib/utils/cache';

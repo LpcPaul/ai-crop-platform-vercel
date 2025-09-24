@@ -6,13 +6,12 @@ function validateRequiredEnvVar(name: string, value: string | undefined): string
   return value;
 }
 
-// Validate critical environment variables in production (temporarily disabled for Vercel deployment)
-// TODO: Add environment variables to Vercel and re-enable validation
-// if (process.env.NODE_ENV === 'production') {
-//   validateRequiredEnvVar('CROP_SERVICE_URL', process.env.CROP_SERVICE_URL);
-//   validateRequiredEnvVar('JWT_SECRET', process.env.JWT_SECRET);
-//   // validateRequiredEnvVar('OPENAI_API_KEY', process.env.OPENAI_API_KEY); // Uncomment when OpenAI is required
-// }
+// Validate critical environment variables in production
+if (process.env.NODE_ENV === 'production') {
+  validateRequiredEnvVar('CROP_SERVICE_URL', process.env.CROP_SERVICE_URL);
+  validateRequiredEnvVar('JWT_SECRET', process.env.JWT_SECRET);
+  // validateRequiredEnvVar('OPENAI_API_KEY', process.env.OPENAI_API_KEY); // Uncomment when OpenAI is required
+}
 
 export const config = {
   // AI API Configuration

@@ -2,9 +2,6 @@ import { redirect } from "next/navigation";
 
 import { authOptions, getCurrentUser } from "@saasfly/auth";
 
-// Force dynamic rendering to avoid build-time auth queries
-export const dynamic = 'force-dynamic';
-
 import { DashboardHeader } from "~/components/header";
 import { DashboardShell } from "~/components/shell";
 import { UserNameForm } from "~/components/user-name-form";

@@ -6,18 +6,18 @@ export const env = createEnv({
     // This is optional because it's only used in development.
     // See https://next-auth.js.org/deployment.
     NEXTAUTH_URL: z.string().url().optional(),
-    NEXTAUTH_SECRET: z.string().min(1).optional(),
-    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
-    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
-    STRIPE_API_KEY: z.string().min(1).optional(),
-    STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
-    RESEND_API_KEY: z.string().min(1).optional(),
-    RESEND_FROM: z.string().min(1).optional(),
+    NEXTAUTH_SECRET: z.string().min(1).optional(), // Made optional for v1.0 launch
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(), // Made optional for v1.0 launch
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(), // Made optional for v1.0 launch
+    STRIPE_API_KEY: z.string().min(1).optional(), // Made optional for v1.0 launch
+    STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(), // Made optional for v1.0 launch
+    RESEND_API_KEY: z.string().min(1).optional(), // Made optional for v1.0 launch
+    RESEND_FROM: z.string().min(1).optional(), // Made optional for v1.0 launch
     ADMIN_EMAIL: z.string().optional(),
     IS_DEBUG: z.string().optional(),
   },
   client: {
-    NEXT_PUBLIC_APP_URL: z.string().min(1).optional(),
+    NEXT_PUBLIC_APP_URL: z.string().min(1),
   },
   runtimeEnv: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,

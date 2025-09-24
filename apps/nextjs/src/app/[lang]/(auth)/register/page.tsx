@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Suspense } from "react";
 
 import { cn } from "@saasfly/ui";
 import { buttonVariants } from "@saasfly/ui/button";
@@ -45,9 +44,7 @@ export default async function RegisterPage({
               Enter your email below to create your account
             </p>
           </div>
-          <Suspense fallback={<div>Loading...</div>}>
-            <UserAuthForm lang={lang} dict={dict.login} disabled={true} />
-          </Suspense>
+          <UserAuthForm lang={lang} dict={dict.login} disabled={true} />
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{" "}
             <Link

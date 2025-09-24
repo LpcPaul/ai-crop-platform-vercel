@@ -3,14 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "contentlayer2 build && SKIP_ENV_VALIDATION=true next build",
-    "build:vercel": "contentlayer2 build && SKIP_ENV_VALIDATION=true next build",
+    "build": "SKIP_ENV_VALIDATION=true next build",
+    "build:vercel": "SKIP_ENV_VALIDATION=true next build",
     "clean": "git clean -xdf .next .turbo node_modules",
     "dev": "next dev",
     "lint": "next lint --quiet",
     "format": "prettier --write '**/*.{js,cjs,mjs,ts,tsx,md,json}' --ignore-path .prettierignore",
-    "start": "next start",
-    "contentlayer:build": "contentlayer2 build"
+    "start": "next start"
   },
   "dependencies": {
     "@dinero.js/currencies": "2.0.0-alpha.14",

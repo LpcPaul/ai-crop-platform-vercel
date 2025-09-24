@@ -4,7 +4,7 @@ import * as z from "zod";
 export const env = createEnv({
   shared: {},
   server: {
-    STRIPE_API_KEY: z.string().optional(),
+    STRIPE_API_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_STRIPE_PRO_PRODUCT_ID: z.string().optional(),

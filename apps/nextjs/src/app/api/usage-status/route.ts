@@ -3,9 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDailyUsageStatus } from '~/lib/utils/daily-usage-limiter';
 import { config } from '~/lib/config';
 
-// Force dynamic rendering for this route
-export const dynamic = 'force-dynamic';
-
 export async function GET(request: NextRequest) {
   try {
     const clientIp =
