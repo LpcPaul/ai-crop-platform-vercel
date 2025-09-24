@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "SKIP_ENV_VALIDATION=true next build",
-    "build:vercel": "SKIP_ENV_VALIDATION=true next build",
+    "build": "SKIP_ENV_VALIDATION=true contentlayer2 build && next build",
+    "build:vercel": "SKIP_ENV_VALIDATION=true contentlayer2 build && next build",
     "clean": "git clean -xdf .next .turbo node_modules",
     "dev": "next dev",
     "lint": "next lint --quiet",
@@ -45,7 +45,14 @@
     "posthog-node": "3.6.2",
     "fetch-ponyfill": "7.1.0",
     "image-size": "^1.0.2",
-    "ioredis": "^5.4.1"
+    "ioredis": "^5.4.1",
+    "contentlayer2": "^0.5.8",
+    "next-contentlayer2": "^0.5.8",
+    "mdast-util-toc": "^7.1.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-pretty-code": "^0.13.2",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.0"
   },
   "devDependencies": {
     "@saasfly/typescript-config": "workspace:*",
